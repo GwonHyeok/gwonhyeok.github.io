@@ -7,10 +7,6 @@ category: webhack
 
 
 
-# IE가 아닌 다른 브라우저에서 홈텍스 사용 시도기
-
-
-
 ### 무엇을 해볼까
 
 이번 글 에서는 macOS +  Chrome 조합으로 홈텍스에서 사용 불가능한 서비스를 사용해보려 한다.
@@ -122,46 +118,46 @@ jQuery Click Event 에 등록되어 있는 콜백 함수가 실행되고 (가장
 ```javascript
 function fn_chkOpenPage(strLgnCertCd, strCertCnfrYn, strSecCardNdYn, strUrl, strName, strMenuId) {	
 	
-	//2018.05.24 멀티브라우저 허용 아이디 
-	var userId = nts_getSession('userId');
-	var aprcPmsId = "reidesign,xbts_user1g3,xnts_user214,xnts_user302,xnts_user307,xnts_user304";
-	var aprcPmsIdArr = aprcPmsId.split(',');
-	var chkAprcPmsId = false;
-	for(var i=0; i < aprcPmsIdArr.length; i++){
-		if(userId == aprcPmsIdArr[i]){
-			chkAprcPmsId = true;
-			break;
-		}
-	}
+  //2018.05.24 멀티브라우저 허용 아이디 
+  var userId = nts_getSession('userId');
+  var aprcPmsId = "reidesign,xbts_user1g3,xnts_user214,xnts_user302,xnts_user307,xnts_user304";
+  var aprcPmsIdArr = aprcPmsId.split(',');
+  var chkAprcPmsId = false;
+  for(var i=0; i < aprcPmsIdArr.length; i++){
+    if(userId == aprcPmsIdArr[i]){
+	  chkAprcPmsId = true;
+	  break;
+    }
+  }
 	
-	if(!chkAprcPmsId){
-		if( NTS_SERVER_TYPE_DOMAIN != NTS_SERVER_TYPE_DOMAIN_JSON["DEV"] ){
-			//2017.11.03 - 남궁형브라우저 종류체크함수 IE가 아니면서 업무가 YS가 아니면 메세지띄우기
-			var browserInfr = nts_getBrowserInfo();
-			
-			if(NTS_SERVER_TYPE_DOMAIN == NTS_SERVER_TYPE_DOMAIN_JSON["VER"]){//검증환경인 경우
-				if(!browserInfr.MSIE){ //IE가 아닌경우(browserInfr.MSIE = true이면 IE)
-					if(strName != "PP" && strName != "YS" && strName != "ET" && strName != "CR" && !(strUrl.indexOf("/wf") > 0) && !(strMenuId == "0108010000" || strMenuId == "0108020000" || strMenuId == "0800000000" || strMenuId == "0307010100" || strMenuId == "0307010300" || strMenuId == "0317000000" || strMenuId == "0402010100" || strMenuId == "0402010200" || strMenuId == "0402010300" || strMenuId == "0402020000" || strMenuId == "0405040000" || strMenuId == "0107010000" || strMenuId == "0403000000" || strMenuId == "4005010000" || strMenuId == "4005070000" || strMenuId == "4005030000" || strMenuId == "0107020000" || strMenuId == "4005020000" || strMenuId == "0601011100" || strMenuId == "0602040600")){
-						alert("원활한 홈택스 이용을 위하여 인터넷 익스플로러(IE) 8 \n이상의 브라우저를 이용하여 주시기 바랍니다.");
-						return;
-					}
-				}
-			}else{//운영환경인경우
-				if(NTS_SERVER_TYPE_DOMAIN != NTS_SERVER_TYPE_DOMAIN_JSON["LOCAL"]){
-					if(!browserInfr.MSIE){ //IE가 아닌경우(browserInfr.MSIE = true이면 IE)
-						if(strName != "PP" && strName != "YS" && strName != "ET" && strName != "CR" && !(strUrl.indexOf("/wf") > 0) && !(strMenuId == "0108010000" || strMenuId == "0108020000" || strMenuId == "0800000000" || strMenuId == "0307010100" || strMenuId == "0307010300" || strMenuId == "0317000000" || strMenuId == "0402010100" || strMenuId == "0402010200" || strMenuId == "0402010300" || strMenuId == "0402020000" || strMenuId == "0405040000" || strMenuId == "0107010000" || strMenuId == "0403000000" || strMenuId == "4005010000" || strMenuId == "4005070000" || strMenuId == "4005030000" || strMenuId == "0107020000" || strMenuId == "4005020000" || strMenuId == "0601011100" || strMenuId == "0602040600")){						
-							alert("원활한 홈택스 이용을 위하여 인터넷 익스플로러(IE) 8 \n이상의 브라우저를 이용하여 주시기 바랍니다.");
-							return;
-						}
-					}
-				}
-			}
-		}
-	}
-	
-    // ================================
-   	// 여기서 부터는 너무 길어서 전부 지웠습니다.
-    // ================================
+  if(!chkAprcPmsId){
+    if( NTS_SERVER_TYPE_DOMAIN != NTS_SERVER_TYPE_DOMAIN_JSON["DEV"] ){
+
+      //2017.11.03 - 남궁형브라우저 종류체크함수 IE가 아니면서 업무가 YS가 아니면 메세지띄우기
+      var browserInfr = nts_getBrowserInfo();
+      if(NTS_SERVER_TYPE_DOMAIN == NTS_SERVER_TYPE_DOMAIN_JSON["VER"]) { //검증환경인 경우
+        if(!browserInfr.MSIE){ //IE가 아닌경우(browserInfr.MSIE = true이면 IE)
+          if(strName != "PP" && strName != "YS" && strName != "ET" && strName != "CR" && !(strUrl.indexOf("/wf") > 0) && manyConditions){
+            alert("원활한 홈택스 이용을 위하여 인터넷 익스플로러(IE) 8 \n이상의 브라우저를 이용하여 주시기 바랍니다.");
+            return;
+          }
+        }
+      }else{//운영환경인경우
+        if(NTS_SERVER_TYPE_DOMAIN != NTS_SERVER_TYPE_DOMAIN_JSON["LOCAL"]){
+          if(!browserInfr.MSIE){ //IE가 아닌경우(browserInfr.MSIE = true이면 IE)
+            if(strName != "PP" && strName != "YS" && strName != "ET" && strName != "CR" && !(strUrl.indexOf("/wf") > 0) && manyConditions){						
+              alert("원활한 홈택스 이용을 위하여 인터넷 익스플로러(IE) 8 \n이상의 브라우저를 이용하여 주시기 바랍니다.");
+              return;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // ================================
+  // 여기서 부터는 너무 길어서 전부 지웠습니다.
+  // ================================
 }
 ```
 
@@ -190,30 +186,30 @@ function fn_chkOpenPage(strLgnCertCd, strCertCnfrYn, strSecCardNdYn, strUrl, str
 즉 fn_chkOpenPage 함수에서 
 
 ```javascript
-	if(!chkAprcPmsId){
-		if( NTS_SERVER_TYPE_DOMAIN != NTS_SERVER_TYPE_DOMAIN_JSON["DEV"] ){
-			//2017.11.03 - 남궁형브라우저 종류체크함수 IE가 아니면서 업무가 YS가 아니면 메세지띄우기
-			var browserInfr = nts_getBrowserInfo();
-			
-			if(NTS_SERVER_TYPE_DOMAIN == NTS_SERVER_TYPE_DOMAIN_JSON["VER"]){//검증환경인 경우
-				if(!browserInfr.MSIE){ //IE가 아닌경우(browserInfr.MSIE = true이면 IE)
-					if(strName != "PP" && strName != "YS" && strName != "ET" && strName != "CR" && !(strUrl.indexOf("/wf") > 0) && !(strMenuId == "0108010000" || strMenuId == "0108020000" || strMenuId == "0800000000" || strMenuId == "0307010100" || strMenuId == "0307010300" || strMenuId == "0317000000" || strMenuId == "0402010100" || strMenuId == "0402010200" || strMenuId == "0402010300" || strMenuId == "0402020000" || strMenuId == "0405040000" || strMenuId == "0107010000" || strMenuId == "0403000000" || strMenuId == "4005010000" || strMenuId == "4005070000" || strMenuId == "4005030000" || strMenuId == "0107020000" || strMenuId == "4005020000" || strMenuId == "0601011100" || strMenuId == "0602040600")){
-						alert("원활한 홈택스 이용을 위하여 인터넷 익스플로러(IE) 8 \n이상의 브라우저를 이용하여 주시기 바랍니다.");
-						return;
-					}
-				}
-			}else{//운영환경인경우
-				if(NTS_SERVER_TYPE_DOMAIN != NTS_SERVER_TYPE_DOMAIN_JSON["LOCAL"]){
-					if(!browserInfr.MSIE){ //IE가 아닌경우(browserInfr.MSIE = true이면 IE)
-						if(strName != "PP" && strName != "YS" && strName != "ET" && strName != "CR" && !(strUrl.indexOf("/wf") > 0) && !(strMenuId == "0108010000" || strMenuId == "0108020000" || strMenuId == "0800000000" || strMenuId == "0307010100" || strMenuId == "0307010300" || strMenuId == "0317000000" || strMenuId == "0402010100" || strMenuId == "0402010200" || strMenuId == "0402010300" || strMenuId == "0402020000" || strMenuId == "0405040000" || strMenuId == "0107010000" || strMenuId == "0403000000" || strMenuId == "4005010000" || strMenuId == "4005070000" || strMenuId == "4005030000" || strMenuId == "0107020000" || strMenuId == "4005020000" || strMenuId == "0601011100" || strMenuId == "0602040600")){						
-							alert("원활한 홈택스 이용을 위하여 인터넷 익스플로러(IE) 8 \n이상의 브라우저를 이용하여 주시기 바랍니다.");
-							return;
-						}
-					}
-				}
-			}
-		}
-	}
+if(!chkAprcPmsId){
+  if( NTS_SERVER_TYPE_DOMAIN != NTS_SERVER_TYPE_DOMAIN_JSON["DEV"] ){
+
+    //2017.11.03 - 남궁형브라우저 종류체크함수 IE가 아니면서 업무가 YS가 아니면 메세지띄우기
+    var browserInfr = nts_getBrowserInfo();
+    if(NTS_SERVER_TYPE_DOMAIN == NTS_SERVER_TYPE_DOMAIN_JSON["VER"]) { //검증환경인 경우
+      if(!browserInfr.MSIE){ //IE가 아닌경우(browserInfr.MSIE = true이면 IE)
+        if(strName != "PP" && strName != "YS" && strName != "ET" && strName != "CR" && !(strUrl.indexOf("/wf") > 0) && manyConditions){
+          alert("원활한 홈택스 이용을 위하여 인터넷 익스플로러(IE) 8 \n이상의 브라우저를 이용하여 주시기 바랍니다.");
+          return;
+        }
+      }
+    } else { //운영환경인경우
+      if(NTS_SERVER_TYPE_DOMAIN != NTS_SERVER_TYPE_DOMAIN_JSON["LOCAL"]){
+        if(!browserInfr.MSIE){ //IE가 아닌경우(browserInfr.MSIE = true이면 IE)
+          if(strName != "PP" && strName != "YS" && strName != "ET" && strName != "CR" && !(strUrl.indexOf("/wf") > 0) && manyConditions){						
+            alert("원활한 홈택스 이용을 위하여 인터넷 익스플로러(IE) 8 \n이상의 브라우저를 이용하여 주시기 바랍니다.");
+            return;
+          }
+        }
+      }
+    }
+  }
+}
 ```
 
 
@@ -222,9 +218,9 @@ function fn_chkOpenPage(strLgnCertCd, strCertCnfrYn, strSecCardNdYn, strUrl, str
 
 ```javascript
 function fn_chkOpenPage() {
-	// 지울 코드는 지우고
+  // 지울 코드는 지우고
     
-    // 원래 코드 살리고
+  // 원래 코드 살리고
 }
 ```
 
@@ -264,8 +260,8 @@ var browserInfr = nts_getBrowserInfo();
 
 ```javascript
 if(!browserInfr.MSIE){
-    alert("원활한 홈택스 이용을 위하여 인터넷 익스플로러(IE) 8 \n이상의 브라우저를 이용하여 주시기 바랍니다.");
-    return;
+  alert("원활한 홈택스 이용을 위하여 인터넷 익스플로러(IE) 8 \n이상의 브라우저를 이용하여 주시기 바랍니다.");
+  return;
 }
 ```
 
@@ -277,7 +273,7 @@ if(!browserInfr.MSIE){
 
 ```javascript
 function nts_getBrowserInfo() {
-    return {MSIE: true};
+  return {MSIE: true};
 }
 ```
 
