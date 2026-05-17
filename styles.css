@@ -1159,7 +1159,7 @@ textarea.input { border-radius: 24px; min-height: 160px; resize: vertical; line-
   .about-hero__title { grid-column: 1 / -1; }
   .about-hero__lead { grid-column: 1 / -1; }
   .about-card { grid-template-columns: 1fr; gap: 40px; }
-  .about-card__photo { position: static; max-width: 360px; margin: 0 auto; }
+  .about-card__photo { position: relative; top: auto; max-width: 360px; margin: 0 auto; }
   .about-card__meta { grid-template-columns: 1fr; }
   .about-card__meta > div:nth-child(2n-1) { padding-right: 0; border-right: none; }
   .about-card__meta > div:nth-child(2n) { padding-left: 0; }
@@ -1321,7 +1321,7 @@ textarea.input { border-radius: 24px; min-height: 160px; resize: vertical; line-
 
 @media (max-width: 900px) {
   .about-people { grid-template-columns: 1fr; gap: 32px; }
-  .founder__pf { position: static; max-width: 320px; margin: 0 auto; }
+  .founder__pf { position: relative; top: auto; max-width: 320px; margin: 0 auto; }
   .collabs__list li { grid-template-columns: 60px 1fr; }
   .collabs__list em { grid-column: 2 / -1; }
 }
