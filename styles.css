@@ -552,6 +552,12 @@ svg { display: block; }
 }
 .svc__anchor:hover span { color: var(--paper); transform: translate(2px, -2px); }
 @media (max-width: 900px) {
+  .svc { grid-template-columns: 1fr; row-gap: 16px; padding: 32px 0; }
+  .svc__idx { grid-column: 1 / -1; }
+  .svc__title { grid-column: 1 / -1; font-size: clamp(24px, 7vw, 32px); }
+  .svc__lead { grid-column: 1 / -1; max-width: none; font-size: 15px; }
+  .svc__list { grid-column: 1 / -1; gap: 8px; }
+  .svc__list li { font-size: 14px; }
   .svc__anchors { grid-column: 1 / -1; }
 }
 
