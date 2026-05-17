@@ -130,3 +130,10 @@ function App() {
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(<App />);
+
+requestAnimationFrame(() => {
+  const boot = document.getElementById("boot");
+  if (!boot) return;
+  boot.classList.add("is-gone");
+  setTimeout(() => boot.remove(), 250);
+});
