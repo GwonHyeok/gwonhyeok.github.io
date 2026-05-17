@@ -1345,6 +1345,10 @@ textarea.input { border-radius: 24px; min-height: 160px; resize: vertical; line-
   .work-row__title, .work-row__meta, .work-row__year, .work-row__idx { grid-column: 1 / -1; text-align: left; }
   .mag__item--lg, .mag__item--md, .mag__item--sm { grid-column: 1 / -1; }
   .case-meta .col, .footer__col, .member, .step { grid-column: span 6; }
+  .footer__top { grid-template-columns: 1fr; row-gap: 28px; }
+  .footer__lead { grid-column: 1 / -1; }
+  .footer__cta { grid-column: 1 / -1; align-self: start; }
+  .footer__btn { padding: 16px 24px; font-size: 15px; white-space: nowrap; }
   .stats { grid-template-columns: repeat(2, 1fr); }
   .clients { grid-template-columns: repeat(3, 1fr); }
   .case-content .label { grid-column: 1 / -1; }
