@@ -178,7 +178,7 @@ function MagneticCta({ children, onClick, strength = 0.3 }) {
   };
   const onLeave = () => { ref.current.style.transform = ""; };
   return (
-    <a ref={ref} className="mcta" href="#quote" onClick={onClick}
+    <a ref={ref} className="mcta" href="/quote/" onClick={onClick}
        onMouseMove={onMove} onMouseLeave={onLeave}>
       {children}
     </a>
@@ -216,7 +216,7 @@ function Featured({ projects, onNav }) {
             <div className="ftd__chips">
               {p.chips.map(c => <span key={c}>{c}</span>)}
             </div>
-            <a className="ftd__cta" href={"#work/"+p.id} onClick={go}>
+            <a className="ftd__cta" href={"/work/" + p.id + "/"} onClick={go}>
               프로젝트 자세히 보기 <span>→</span>
             </a>
           </div>
@@ -232,7 +232,7 @@ function Featured({ projects, onNav }) {
             ))}
           </div>
         </div>
-        <a className="ftd__media" href={"#work/"+p.id} onClick={go}>
+        <a className="ftd__media" href={"/work/" + p.id + "/"} onClick={go}>
           <div className={"ftd__art ftd__art--" + p.id} key={p.id}>
             {p.image && <img className={"ftd__img" + (p.imageOrient === "landscape" ? " ftd__img--wide" : "")} src={p.image} alt={p.titleEn} loading="lazy" />}
             <span className="ftd__ph">{p.titleEn.toUpperCase()} · KEY VISUAL</span>
@@ -301,7 +301,7 @@ function Home({ onNav }) {
         <div className="work-list">
           {window.PROJECTS.slice(0, 5).map((p, i) => (
             <a key={p.id} className="work-row reveal"
-               href={"#work/" + p.id}
+               href={"/work/" + p.id + "/"}
                onClick={(e)=>{e.preventDefault(); onNav("work/"+p.id);}}>
               <span className="work-row__idx">— {String(i+1).padStart(2,"0")}</span>
               <h3 className="work-row__title">{p.title}</h3>
@@ -316,7 +316,7 @@ function Home({ onNav }) {
         </div>
         <div style={{ marginTop: 28, display: "flex", justifyContent: "flex-end" }}>
           <a className="nav__cta" style={{borderColor:"var(--ink)", color:"var(--ink)"}}
-             href="#work" onClick={(e)=>{e.preventDefault(); onNav("work");}}>
+             href="/work/" onClick={(e)=>{e.preventDefault(); onNav("work");}}>
             전체 포트폴리오 보기 →
           </a>
         </div>

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>404 — 페이지를 찾을 수 없습니다 | GHPlanet</title>
+  <meta name="description" content="요청하신 페이지를 찾을 수 없습니다. GHPlanet 홈으로 이동하세요." />
+  <meta name="robots" content="noindex, follow" />
+  <link rel="icon" href="/profile/me.png" type="image/png" />
+  <link rel="stylesheet" href="/styles.css" />
+  <script>
+    // SPA-friendly 404: redirect to root, preserving the original path as hash.
+    // App reads pathname/hash on mount and routes to the closest match.
+    (function () {
+      var path = window.location.pathname;
+      var search = window.location.search || "";
+      // If we accidentally land here on /index.html, just go to /.
+      if (!path || path === "/" || path === "/index.html") {
+        window.location.replace("/");
+        return;
+      }
+      // Preserve original path in sessionStorage so the SPA can react if needed.
+      try { sessionStorage.setItem("__404_from", path + search); } catch (e) {}
+      window.location.replace("/");
+    })();
+  </script>
+</head>
+<body style="font-family: 'Pretendard Variable', -apple-system, sans-serif; background: #fafaf8; color: #0c0e10;">
+  <main style="max-width: 640px; margin: 0 auto; padding: 12vh 24px;">
+    <h1 style="font-size: 48px; letter-spacing: -0.03em; margin: 0 0 16px;">404</h1>
+    <p style="color: #6b7178; font-size: 16px; line-height: 1.7;">
+      요청하신 페이지를 찾을 수 없습니다.
+      <a href="/" style="color: inherit; border-bottom: 1px solid currentColor; padding-bottom: 1px;">홈으로 이동</a>
+    </p>
+    <nav style="margin-top: 32px; color: #6b7178; font-size: 13px;">
+      <a href="/about/" style="color:inherit; margin-right:14px">소개</a>
+      <a href="/services/" style="color:inherit; margin-right:14px">서비스</a>
+      <a href="/work/" style="color:inherit; margin-right:14px">포트폴리오</a>
+      <a href="/contact/" style="color:inherit">연락</a>
+    </nav>
+  </main>
+</body>
+</html>

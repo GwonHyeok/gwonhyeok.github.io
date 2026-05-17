@@ -9,8 +9,17 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
 }/*EDITMODE-END*/;
 
 function parseRoute() {
-  const h = window.location.hash.replace(/^#/, "") || "home";
-  return h;
+  const path = window.location.pathname.replace(/^\/+|\/+$/g, "");
+  const knownTop = ["about", "services", "work", "contact", "quote"];
+  if (path) {
+    if (knownTop.includes(path)) return path;
+    if (path.startsWith("work/")) {
+      const id = path.slice(5).replace(/\/$/, "");
+      return id ? "work/" + id : "work";
+    }
+  }
+  const h = window.location.hash.replace(/^#/, "");
+  return h || "home";
 }
 
 function App() {
@@ -26,7 +35,7 @@ function App() {
     cls.add("pal-" + (t.palette || "warm"));
   }, [t.palette]);
 
-  // Hash listener
+  // Browser back/forward & hash listener
   useAE(() => {
     const on = () => {
       const next = parseRoute();
@@ -35,17 +44,34 @@ function App() {
         window.scrollTo({ top: 0, behavior: "instant" });
       });
     };
+    window.addEventListener("popstate", on);
     window.addEventListener("hashchange", on);
-    return () => window.removeEventListener("hashchange", on);
+    return () => {
+      window.removeEventListener("popstate", on);
+      window.removeEventListener("hashchange", on);
+    };
   }, [wipe]);
 
   const nav = useAC((next) => {
-    if (next === route.split("/")[0] && !next.includes("/")) {
+    const cur = parseRoute();
+    if (next === cur) {
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
-    window.location.hash = "#" + next;
-  }, [route]);
+    const target = next === "home" ? "/" : "/" + next + "/";
+    wipe(() => {
+      if (window.history && window.history.pushState) {
+        try { window.history.pushState({}, "", target); } catch (e) { window.location.href = target; return; }
+      } else {
+        window.location.href = target;
+        return;
+      }
+      setRoute(next);
+      window.scrollTo({ top: 0, behavior: "instant" });
+      // Update document title to match the page
+      if (window.__updatePageTitle) window.__updatePageTitle(next);
+    });
+  }, [wipe]);
 
   // Render route
   let page;

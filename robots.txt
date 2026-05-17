@@ -1,0 +1,18 @@
+# GHPlanet · 1인 디지털 스튜디오
+# https://ghyeok.io
+
+User-agent: *
+Allow: /
+Disallow: /_seo/
+
+# AI 크롤러 — 본인 사이트 학습 허용
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://ghyeok.io/sitemap.xml

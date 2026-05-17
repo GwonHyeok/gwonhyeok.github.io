@@ -289,7 +289,7 @@ function Work({ onNav }) {
         <div className="mag">
           {layout.map(({ p, cls }) => (
             <a key={p.id} className={"mag__item " + cls}
-               href={"#work/" + p.id}
+               href={"/work/" + p.id + "/"}
                onClick={(e)=>{e.preventDefault(); onNav("work/"+p.id);}}
                data-cursor="drag" data-cursor-label="Open">
               <div className="mag__media">
@@ -444,7 +444,7 @@ function WorkDetail({ id, onNav }) {
       </section>
 
       {/* Next */}
-      <a className="sec wrap" href={"#work/" + next.id}
+      <a className="sec wrap" href={"/work/" + next.id + "/"}
          onClick={(e)=>{e.preventDefault(); onNav("work/"+next.id);}}
          style={{display:"block", borderTop:"1px solid var(--line)"}} data-cursor="drag" data-cursor-label="Next">
         <div className="sec__head">
@@ -550,10 +550,10 @@ function Quote({ onNav }) {
               로 직접 보내주세요.
             </p>
             <div style={{display:"flex", gap:12, marginTop:36}}>
-              <a className="opt" href="#work" style={{flex:1}} onClick={(e)=>{e.preventDefault(); onNav("work");}}>
+              <a className="opt" href="/work/" style={{flex:1}} onClick={(e)=>{e.preventDefault(); onNav("work");}}>
                 포트폴리오 보기 <span className="num">→</span>
               </a>
-              <a className="opt" href="#home" style={{flex:1}} onClick={(e)=>{e.preventDefault(); onNav("home");}}>
+              <a className="opt" href="/" style={{flex:1}} onClick={(e)=>{e.preventDefault(); onNav("home");}}>
                 홈으로 <span className="num">↩</span>
               </a>
             </div>

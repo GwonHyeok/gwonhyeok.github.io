@@ -81,21 +81,21 @@ function Intro({ onDone }) {
 function Nav({ route, onNav }) {
   return (
     <nav className="nav">
-      <a className="nav__brand" href="#home" onClick={(e)=>{e.preventDefault(); onNav("home");}} data-cursor="link" data-cursor-label="Index">
+      <a className="nav__brand" href="/" onClick={(e)=>{e.preventDefault(); onNav("home");}} data-cursor="link" data-cursor-label="Index">
         <span className="dot" />
         <span>GHPlanet</span>
       </a>
       <div className="nav__links">
         {window.NAV_LINKS.map(l => (
           <a key={l.key} className={"nav__link " + (route === l.key ? "is-active" : "")}
-             href={"#" + l.key} onClick={(e)=>{e.preventDefault(); onNav(l.key);}}>
+             href={l.key === "home" ? "/" : "/" + l.key + "/"} onClick={(e)=>{e.preventDefault(); onNav(l.key);}}>
             <span className="nav__link__stack">
               <span>{l.label}</span>
             </span>
           </a>
         ))}
       </div>
-      <a className="nav__cta" href="#quote" onClick={(e)=>{e.preventDefault(); onNav("quote");}} data-cursor="link" data-cursor-label="견적">
+      <a className="nav__cta" href="/quote/" onClick={(e)=>{e.preventDefault(); onNav("quote");}} data-cursor="link" data-cursor-label="견적">
         <span className="pulse" />
         프로젝트 의뢰
       </a>
@@ -125,7 +125,7 @@ function Footer({ onNav }) {
           GHPlanet과 함께 시작해 보세요.
         </div>
         <div className="footer__cta">
-          <a className="footer__btn" href="#quote" onClick={(e)=>{e.preventDefault(); onNav("quote");}} data-cursor="link" data-cursor-label="Start">
+          <a className="footer__btn" href="/quote/" onClick={(e)=>{e.preventDefault(); onNav("quote");}} data-cursor="link" data-cursor-label="Start">
             견적 요청하기 <span className="arrow"/>
           </a>
         </div>
@@ -133,10 +133,10 @@ function Footer({ onNav }) {
       <div className="footer__cols">
         <div className="footer__col">
           <h4>스튜디오</h4>
-          <a href="#about" onClick={(e)=>{e.preventDefault(); onNav("about");}}>소개</a>
-          <a href="#services" onClick={(e)=>{e.preventDefault(); onNav("services");}}>서비스</a>
-          <a href="#work" onClick={(e)=>{e.preventDefault(); onNav("work");}}>포트폴리오</a>
-          <a href="#contact" onClick={(e)=>{e.preventDefault(); onNav("contact");}}>연락</a>
+          <a href="/about/" onClick={(e)=>{e.preventDefault(); onNav("about");}}>소개</a>
+          <a href="/services/" onClick={(e)=>{e.preventDefault(); onNav("services");}}>서비스</a>
+          <a href="/work/" onClick={(e)=>{e.preventDefault(); onNav("work");}}>포트폴리오</a>
+          <a href="/contact/" onClick={(e)=>{e.preventDefault(); onNav("contact");}}>연락</a>
         </div>
         <div className="footer__col">
           <h4>연락</h4>
