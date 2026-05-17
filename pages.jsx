@@ -129,7 +129,7 @@ function About({ onNav }) {
             <span className="prompt">→ 12</span>
             <span className="cursor">_</span>
           </div>
-          <img className="founder__pf-img" src="profile/me.png" alt="GHyeok 권혁" />
+          <img className="founder__pf-img" src="/profile/me.png" alt="GHyeok 권혁" />
           <div className="founder__pf-badge" aria-hidden>
             <span className="dot" /> ONLINE
           </div>
