@@ -70,6 +70,8 @@ function App() {
       <Nav route={route.split("/")[0]} onNav={nav} />
       <div key={route}>{page}</div>
       {route !== "quote" && <Footer onNav={nav} />}
+      <CommandPalette onNav={nav} route={route} />
+      <StatusBar route={route} />
 
       <TweaksPanel>
         <TweakSection label="Palette" />

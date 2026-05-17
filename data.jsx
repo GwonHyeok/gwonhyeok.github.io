@@ -137,11 +137,11 @@ const PROJECTS = [
     year: "2022–2023",
     services: ["앱", "백엔드"],
     chips: ["Flutter", "PHP", "iOS", "Android"],
-    summary: "해부학 암기 앱 신규 서비스. 이파마스터와 호환되는 API를 PHP로 구축.",
+    summary: "운동지도자(트레이너)를 위한 해부학 암기 앱. 근육·뼈·관절 명칭을 퀴즈로 학습. 이파마스터의 자매 앱.",
     role: "유일 앱 개발자",
     duration: "MVP → 정식 출시",
     award: "—",
-    industry: "에듀테크 · 의료",
+    industry: "에듀테크 · 운동지도자",
     image: "project-images/stores/anatomaster-02.png",
     images: [
       "project-images/stores/anatomaster-02.png",
@@ -161,11 +161,11 @@ const PROJECTS = [
     year: "2021–현재",
     services: ["앱", "백엔드"],
     chips: ["Flutter", "PHP", "iOS", "Android"],
-    summary: "약학 학습 통합 앱. 수강·암기·퀴즈를 한 곳에서. 용감한컴퍼니 메인 프로덕트.",
+    summary: "운동지도자(트레이너) 학습·커뮤니티 앱. 4만+ 트레이너가 사용하는 콘텐츠·칼럼·커뮤니티 통합 플랫폼. 용감한컴퍼니 메인 프로덕트.",
     role: "유일 앱 개발자",
     duration: "정식 출시 → 운영 고도화",
     award: "—",
-    industry: "에듀테크 · 의료",
+    industry: "에듀테크 · 운동지도자",
     image: "project-images/stores/iipa-02.png",
     images: [
       "project-images/stores/iipa-02.png",
@@ -175,7 +175,7 @@ const PROJECTS = [
       "project-images/stores/iipa-06.png",
       "project-images/stores/iipa-07.png",
     ],
-    desc: "Flutter 단일 코드베이스로 iOS·Android 동시 출시, PHP API 호환성을 유지하며 학습 흐름·결제·콘텐츠 관리까지 1인 개발."
+    desc: "Flutter 단일 코드베이스로 iOS·Android 동시 출시, PHP API 호환성을 유지하며 콘텐츠·칼럼·커뮤니티·결제까지 1인 개발."
   },
   {
     id: "noleet",

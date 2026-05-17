@@ -251,7 +251,16 @@ function Home({ onNav }) {
   return (
     <main>
       {/* HERO — calm and direct */}
-      <section className="hero hero--clean">
+      <section className="hero hero--clean"
+        onMouseMove={(e) => {
+          const r = e.currentTarget.getBoundingClientRect();
+          e.currentTarget.style.setProperty("--mx", ((e.clientX - r.left) / r.width * 100) + "%");
+          e.currentTarget.style.setProperty("--my", ((e.clientY - r.top) / r.height * 100) + "%");
+          e.currentTarget.classList.add("has-cursor");
+        }}
+        onMouseLeave={(e) => e.currentTarget.classList.remove("has-cursor")}
+      >
+        <div className="hero__spotlight" aria-hidden />
         <HeroSphere />
         <div className="wrap hero__inner">
           <div className="hero__top">

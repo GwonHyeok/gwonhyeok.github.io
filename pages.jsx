@@ -2,6 +2,97 @@
 const { useState: useS, useEffect: useE, useMemo: useM } = React;
 
 // ─────────────────────────── About
+function CareerHeatmap() {
+  const CURRENT = { year: 2026, month: 5 };
+  const START_YEAR = 2014;
+  const months = Array.from({ length: 12 }, (_, i) => i + 1);
+  const years = Array.from({ length: CURRENT.year - START_YEAR + 1 }, (_, i) => START_YEAR + i);
+
+  const earlyHistory = [
+    { title: "after4days (아날로그 사이트)", start: [2014, 6], end: [2014, 12] },
+    { title: "강남대학교 컴퓨터미디어공학과", start: [2014, 3], end: [2022, 2] },
+    { title: "프리랜서 크롤러 개발", start: [2019, 1], end: [2020, 6] },
+    { title: "백주부 요리 레시피", start: [2019, 8], end: [2021, 12] },
+    { title: "디톡스", start: [2020, 1], end: [2020, 6] },
+    { title: "펫소스", start: [2020, 8], end: [2021, 12] },
+    { title: "페어웨이", start: [2020, 10], end: [2021, 4] },
+  ];
+
+  const grid = {};
+  const list = window.ALL_PROJECTS || window.PROJECTS;
+  list.forEach(p => {
+    const parts = p.year.split("–").map(s => s.trim());
+    const startY = parseInt(parts[0], 10);
+    const isCurrent = parts[1] === "현재";
+    const endY = parts.length > 1 ? (isCurrent ? CURRENT.year : parseInt(parts[1], 10)) : startY;
+    const endM = parts.length > 1 ? (isCurrent ? CURRENT.month : 12) : 12;
+    for (let y = startY; y <= endY; y++) {
+      for (let m = 1; m <= 12; m++) {
+        if (y === endY && m > endM) continue;
+        if (y > CURRENT.year || (y === CURRENT.year && m > CURRENT.month)) continue;
+        if (!grid[y]) grid[y] = {};
+        if (!grid[y][m]) grid[y][m] = [];
+        grid[y][m].push(p.title);
+      }
+    }
+  });
+  earlyHistory.forEach(({ title, start, end }) => {
+    for (let y = start[0]; y <= end[0]; y++) {
+      const mStart = y === start[0] ? start[1] : 1;
+      const mEnd = y === end[0] ? end[1] : 12;
+      for (let m = mStart; m <= mEnd; m++) {
+        if (!grid[y]) grid[y] = {};
+        if (!grid[y][m]) grid[y][m] = [];
+        grid[y][m].push(title);
+      }
+    }
+  });
+
+  return (
+    <div className="heatmap">
+      <div className="heatmap__legend">
+        <span>활동 적음</span>
+        <span className="hcell hcell--0" />
+        <span className="hcell hcell--1" />
+        <span className="hcell hcell--2" />
+        <span className="hcell hcell--3" />
+        <span className="hcell hcell--4" />
+        <span>많음</span>
+      </div>
+      <div className="heatmap__grid">
+        <div className="heatmap__monthrow">
+          <span className="heatmap__yearlbl" />
+          {months.map(m => (
+            <span key={m} className="heatmap__monthlbl">{String(m).padStart(2, "0")}</span>
+          ))}
+        </div>
+        {years.map(y => (
+          <div key={y} className="heatmap__yearrow">
+            <span className="heatmap__yearlbl">{y}</span>
+            {months.map(m => {
+              const projs = (grid[y] && grid[y][m]) || [];
+              const isFuture = y === CURRENT.year && m > CURRENT.month;
+              const level = isFuture ? -1 : Math.min(projs.length, 4);
+              const tip = isFuture
+                ? `${y}.${String(m).padStart(2, "0")} — 미래`
+                : projs.length
+                  ? `${y}.${String(m).padStart(2, "0")} · ${projs.length}개 진행\n— ${projs.join("\n— ")}`
+                  : `${y}.${String(m).padStart(2, "0")}`;
+              return (
+                <span
+                  key={m}
+                  className={`hcell hcell--${level === -1 ? "f" : level}`}
+                  title={tip}
+                />
+              );
+            })}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function About({ onNav }) {
   return (
     <main>
@@ -64,7 +155,7 @@ function About({ onNav }) {
             <p>
               <b>그동안의 결과물.</b> 데이코어 <b>짐데이</b>(누적 100만 다운로드, PHP→Node.js 마이그레이션 · Aurora Serverless · 1,000만 운동 데이터 기반 추천 AI),
               라이프에이드 <b>피지컬갤러리 Pro</b>(300만 구독자 채널 기반, 동시접속 2,500+ 대응),
-              용감한컴퍼니 <b>이파마스터·아나토미마스터</b>(약학·해부학 학습앱),
+              용감한컴퍼니 <b>이파마스터·아나토미마스터</b>(4만+ 운동지도자 학습·커뮤니티),
               놀잇 <b>실시간 영상 채팅</b>(Agora · Firebase),
               소울톡 <b>온라인 타로 상담</b>(Firestore · Agora).
             </p>

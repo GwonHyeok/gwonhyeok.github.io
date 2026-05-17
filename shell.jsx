@@ -261,4 +261,198 @@ function HoverPreview() {
   );
 }
 
-Object.assign(window, { Cursor, Intro, Nav, useCurtain, Footer, useReveal, Marquee, Magnetic, HoverPreview });
+// ─── Command Palette (⌘K / Ctrl+K)
+function CommandPalette({ onNav, route }) {
+  const [open, setOpen] = useState(false);
+  const [q, setQ] = useState("");
+  const [idx, setIdx] = useState(0);
+  const inputRef = useRef(null);
+
+  const actions = useMemo(() => {
+    const projects = (window.PROJECTS || []).map(p => ({
+      type: "project",
+      group: "작업",
+      label: p.title,
+      hint: p.industry + " · " + p.year,
+      run: () => onNav("work/" + p.id),
+    }));
+    const pages = [
+      { type: "page", group: "페이지", label: "홈",        hint: "/",          run: () => onNav("home") },
+      { type: "page", group: "페이지", label: "소개",      hint: "/about",     run: () => onNav("about") },
+      { type: "page", group: "페이지", label: "서비스",    hint: "/services",  run: () => onNav("services") },
+      { type: "page", group: "페이지", label: "포트폴리오", hint: "/work",      run: () => onNav("work") },
+      { type: "page", group: "페이지", label: "연락",      hint: "/contact",   run: () => onNav("contact") },
+      { type: "page", group: "페이지", label: "프로젝트 의뢰", hint: "/quote",  run: () => onNav("quote") },
+    ];
+    const links = [
+      { type: "link", group: "외부", label: "이메일 보내기",   hint: "me@ghyeok.io", run: () => { window.location.href = "mailto:me@ghyeok.io"; } },
+      { type: "link", group: "외부", label: "GitHub",         hint: "github.com/GwonHyeok", run: () => window.open("https://github.com/GwonHyeok", "_blank") },
+    ];
+    return [...pages, ...projects, ...links];
+  }, [onNav, route]);
+
+  const filtered = useMemo(() => {
+    const s = q.trim().toLowerCase();
+    if (!s) return actions;
+    return actions.filter(a =>
+      a.label.toLowerCase().includes(s) ||
+      a.hint.toLowerCase().includes(s) ||
+      a.group.toLowerCase().includes(s)
+    );
+  }, [q, actions]);
+
+  useEffect(() => { setIdx(0); }, [q]);
+
+  useEffect(() => {
+    const onKey = (e) => {
+      const cmd = e.metaKey || e.ctrlKey;
+      if (cmd && (e.key === "k" || e.key === "K")) {
+        e.preventDefault();
+        setOpen(o => !o);
+      } else if (e.key === "Escape" && open) {
+        setOpen(false);
+      } else if (open && e.key === "ArrowDown") {
+        e.preventDefault();
+        setIdx(i => Math.min(filtered.length - 1, i + 1));
+      } else if (open && e.key === "ArrowUp") {
+        e.preventDefault();
+        setIdx(i => Math.max(0, i - 1));
+      } else if (open && e.key === "Enter") {
+        e.preventDefault();
+        const sel = filtered[idx];
+        if (sel) { sel.run(); setOpen(false); setQ(""); }
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open, filtered, idx]);
+
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+      setTimeout(() => inputRef.current?.focus(), 30);
+    } else {
+      document.body.style.overflow = "";
+      setQ("");
+    }
+  }, [open]);
+
+  if (!open) return null;
+
+  let lastGroup = null;
+  return (
+    <div className="cmdk" onClick={() => setOpen(false)} role="dialog" aria-modal="true">
+      <div className="cmdk__panel" onClick={(e) => e.stopPropagation()}>
+        <div className="cmdk__inputbar">
+          <span className="cmdk__prompt">⌘K ›</span>
+          <input
+            ref={inputRef}
+            className="cmdk__input"
+            placeholder="페이지 · 프로젝트 · 연락 검색…"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            data-cursor="text"
+          />
+          <span className="cmdk__esc">ESC</span>
+        </div>
+        <div className="cmdk__list">
+          {filtered.length === 0 && (
+            <div className="cmdk__empty">결과 없음 — "{q}"</div>
+          )}
+          {filtered.map((a, i) => {
+            const showGroup = a.group !== lastGroup;
+            lastGroup = a.group;
+            return (
+              <React.Fragment key={a.label + i}>
+                {showGroup && <div className="cmdk__group">{a.group}</div>}
+                <button
+                  type="button"
+                  className={"cmdk__item " + (i === idx ? "is-on" : "")}
+                  onMouseEnter={() => setIdx(i)}
+                  onClick={() => { a.run(); setOpen(false); setQ(""); }}
+                  data-cursor="link"
+                >
+                  <span className="cmdk__item-label">{a.label}</span>
+                  <span className="cmdk__item-hint">{a.hint}</span>
+                  <span className="cmdk__item-arrow">↵</span>
+                </button>
+              </React.Fragment>
+            );
+          })}
+        </div>
+        <div className="cmdk__foot">
+          <span><kbd>↑</kbd><kbd>↓</kbd> 이동</span>
+          <span><kbd>↵</kbd> 선택</span>
+          <span><kbd>esc</kbd> 닫기</span>
+          <span className="cmdk__foot-right">{filtered.length}개 항목</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── tmux-style Status Bar (bottom, hides over dark footer)
+function StatusBar({ route }) {
+  const [scroll, setScroll] = useState(0);
+  const [hide, setHide] = useState(false);
+  const [time, setTime] = useState("");
+
+  useEffect(() => {
+    const onScroll = () => {
+      const h = document.documentElement;
+      const max = h.scrollHeight - h.clientHeight;
+      const top = h.scrollTop || window.scrollY;
+      setScroll(max > 0 ? Math.round(top / max * 100) : 0);
+      // Hide when overlapping the dark footer zone (last ~360px of page)
+      const distFromBottom = max - top;
+      setHide(distFromBottom < 360);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [route]);
+
+  useEffect(() => {
+    const upd = () => {
+      try {
+        const fmt = new Intl.DateTimeFormat("en-GB", {
+          timeZone: "Asia/Seoul", hour: "2-digit", minute: "2-digit", hour12: false,
+        });
+        setTime(fmt.format(new Date()));
+      } catch { setTime(""); }
+    };
+    upd();
+    const id = setInterval(upd, 30000);
+    return () => clearInterval(id);
+  }, []);
+
+  const pathFor = (r) => {
+    if (r.startsWith("work/")) return "~/ghyeok/work/" + r.slice(5) + ".md";
+    if (r === "home" || !r) return "~/ghyeok";
+    return "~/ghyeok/" + r + ".md";
+  };
+
+  const isMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+  const cmdKey = isMac ? "⌘" : "Ctrl";
+
+  return (
+    <div className={"statusbar" + (hide ? " is-hidden" : "")} aria-hidden="true">
+      <span className="sb__seg sb__seg--brand">[main]</span>
+      <span className="sb__seg sb__seg--path">{pathFor(route)}</span>
+      <span className="sb__seg sb__bar">▍</span>
+      <span className="sb__seg sb__seg--scroll">↓ {String(scroll).padStart(2, "0")}%</span>
+      <span className="sb__seg sb__bar">▍</span>
+      <span className="sb__seg sb__seg--time">{time} KST</span>
+      <span className="sb__seg sb__spacer" />
+      <span className="sb__seg sb__seg--hint">{cmdKey}K · 어디로든</span>
+      <span className="sb__seg sb__bar">▍</span>
+      <span className="sb__seg sb__seg--dot"><span className="sb__dot" /> LIVE</span>
+    </div>
+  );
+}
+
+Object.assign(window, { Cursor, Intro, Nav, useCurtain, Footer, useReveal, Marquee, Magnetic, HoverPreview, CommandPalette, StatusBar });
