@@ -140,25 +140,22 @@ function Footer({ onNav }) {
         </div>
         <div className="footer__col">
           <h4>연락</h4>
-          <a href="mailto:hello@ghplanet.studio">hello@ghplanet.studio</a>
-          <a href="#">+82 2 1234 5678</a>
-          <p>월–금 / 10:00–19:00 KST</p>
+          <a href="mailto:me@ghyeok.io">me@ghyeok.io</a>
+          <p>언제든 편하게 연락 주세요</p>
         </div>
         <div className="footer__col">
-          <h4>사무실</h4>
-          <p>서울특별시 성수동2가 277-32<br/>플래닛 빌딩 4F</p>
+          <h4>플랫폼</h4>
+          <a href="https://www.wishket.com/partners/p/kh4975/" target="_blank" rel="noopener" data-cursor="link" data-cursor-label="↗">Wishket · kh4975</a>
+          <a href="https://kmong.com/@%EA%B6%8C%ED%98%81" target="_blank" rel="noopener" data-cursor="link" data-cursor-label="↗">Kmong · 권혁</a>
         </div>
         <div className="footer__col">
-          <h4>팔로우</h4>
-          <a href="#" data-cursor="link" data-cursor-label="↗">Instagram</a>
-          <a href="#" data-cursor="link" data-cursor-label="↗">Behance</a>
-          <a href="#" data-cursor="link" data-cursor-label="↗">Are.na</a>
-          <a href="#" data-cursor="link" data-cursor-label="↗">LinkedIn</a>
+          <h4>코드</h4>
+          <a href="https://github.com/GwonHyeok" target="_blank" rel="noopener" data-cursor="link" data-cursor-label="↗">GitHub · GwonHyeok</a>
         </div>
       </div>
       <div className="footer__base">
-        <span>© 2018–2026 GHPlanet · 권혁</span>
-        <span>Made in Seoul · 사업자 219-87-00000</span>
+        <span>© 2021–2026 GHPlanet (지에이치플래닛) · 권혁</span>
+        <span>사업자 등록 2021.11.24 · 등록번호 589-11-01997</span>
       </div>
     </footer>
   );

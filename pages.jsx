@@ -9,13 +9,13 @@ function About({ onNav }) {
         <div className="page-head">
           <span className="page-head__num">— 02</span>
           <h1 className="display page-head__title">
-            서울의 1인 디지털 스튜디오.
+            1인 디지털 스튜디오.
           </h1>
           <div className="page-head__meta">
-            <div className="row"><span>설립</span><span>2018</span></div>
-            <div className="row"><span>팀</span><span>1 + 외부 콜라보</span></div>
-            <div className="row"><span>위치</span><span>서울 · 원격</span></div>
-            <div className="row"><span>분야</span><span>앱 · 웹</span></div>
+            <div className="row"><span>사업자 등록</span><span>2021.11.24</span></div>
+            <div className="row"><span>경력</span><span>12년차 풀스택 개발자</span></div>
+            <div className="row"><span>위치</span><span>원격 협업</span></div>
+            <div className="row"><span>분야</span><span>모바일 앱 · 백엔드 · 웹 · AI</span></div>
           </div>
         </div>
       </section>
@@ -43,8 +43,8 @@ function About({ onNav }) {
           {[
             { n: "01", t: "한 명의 완전한 소유권", d: "의사결정자가 한 명이라서, 전달 손실이 없고 항상 빠릅니다." },
             { n: "02", t: "작동하는 소프트웨어 우선", d: "데크보다 빠른 프로토타입. 결정은 동작하는 화면으로 합니다." },
-            { n: "03", t: "타이포그래피 우선", d: "한글 타이포그래피와 카피라이팅을 디자인의 일부로 다룹니다." },
-            { n: "04", t: "출시 후 동행", d: "출시는 끝이 아닌 시작. 12주 그로스 사이클을 함께 돕습니다." },
+            { n: "03", t: "AI를 도구로", d: "코딩·디자인·리서치에 AI를 적극 활용해 외부 협업자 없이도 1인이 풀스택을 완주합니다." },
+            { n: "04", t: "출시 후 동행", d: "출시는 끝이 아닌 시작. 운영·그로스까지 같은 사람이 책임집니다." },
           ].map(s => (
             <div key={s.n} className="step">
               <div className="step__n">{s.n}</div>
@@ -57,43 +57,36 @@ function About({ onNav }) {
 
       <section className="sec wrap">
         <div className="sec__head">
-          <span className="cap sec__num">A.03 — 사람</span>
-          <h2 className="h2 sec__title">운영자와 콜라보레이터.</h2>
-          <p className="sec__aside body">해손권자는 한 명. 필요한 때마다 외부 전문가를 붙입니다.</p>
+          <span className="cap sec__num">A.03 — 운영자</span>
+          <h2 className="h2 sec__title">한 사람이 전부 책임집니다.</h2>
+          <p className="sec__aside body">기획·디자인·앱·백엔드·인프라·운영까지. AI를 도구로 외부 협업자 없이 1인 풀스택으로 완주합니다.</p>
         </div>
         <div className="about-people">
           <div className="founder">
             <div className="founder__pf"><div className="ph">프로필</div></div>
             <div className="founder__head">
-              <div className="founder__name">권혁 · GH</div>
-              <div className="founder__role">Founder · Designer · Engineer</div>
+              <div className="founder__name">권혁 · GHyeok</div>
+              <div className="founder__role">12년차 풀스택 개발자 · Founder</div>
             </div>
             <p className="founder__bio">
-              2018년부터 모바일 앱과 웹 프로덕트를 만들어 왔습니다. 기획·디자인·프론트·백엔드를 혼자 처리합니다.
-              한국 대기업, 스타트업, 정부 기관까지 — 어그레시브한 일정 안에서도 디테일을 놓치지 않는 것에 자신 있습니다.
+              2014년부터 모바일 앱·백엔드·웹을 만들어 온 12년차 풀스택 개발자입니다.
+              <br/><br/>
+              <b>최근 작업.</b> 캐시백·리워드 플랫폼 <b>TUK</b>(Flutter 앱 + NestJS API + Next.js 어드민 + K8s/Terraform 인프라 1인 풀스택), 키즈 전문가 매칭 글로벌 서비스 <b>모든별키즈</b>(Next.js·i18n), 자체 운영 중인 북마크 앱 <b>Pinned!</b>(iOS·Android 네이티브).
+              <br/><br/>
+              <b>그동안의 결과물.</b> 데이코어 <b>짐데이</b>(누적 100만 다운로드, PHP→Node.js 마이그레이션 · Aurora Serverless · 1,000만 운동 데이터 기반 추천 AI), 라이프에이드 <b>피지컬갤러리 Pro</b>(300만 구독자 채널 기반, 동시접속 2,500+ 대응), 용감한컴퍼니 <b>이파마스터·아나토미마스터</b>(약학·해부학 학습앱), 놀잇 <b>실시간 영상 채팅</b>(Agora·Firebase), 소울톡 <b>온라인 타로 상담</b>(Firestore·Agora).
+              <br/><br/>
+              앱·서버·웹·인프라·운영을 한 사람이 책임집니다. 의사결정자가 한 명이라 빠르고 일관되며, AI를 도구로 외부 협업자 없이 1인이 풀스택을 완주합니다.
             </p>
-          </div>
-          <div className="collabs">
-            <div className="collabs__lbl">자주 함께하는 외부 콜라보레이터</div>
-            <ul className="collabs__list">
-              {window.COLLABORATORS.map((c, i) => (
-                <li key={i}>
-                  <span className="collabs__n">— {String(i+1).padStart(2,"0")}</span>
-                  <b>{c.role}</b>
-                  <em>{c.note}</em>
-                </li>
-              ))}
-            </ul>
           </div>
         </div>
       </section>
 
       <section className="sec wrap" style={{paddingTop:"clamp(40px, 6vw, 80px)"}}>
         <div className="stats">
-          <div><div className="stat__n">7년</div><div className="stat__lbl">운영 연차</div></div>
-          <div><div className="stat__n">24</div><div className="stat__lbl">납품 프로젝트</div></div>
-          <div><div className="stat__n">1</div><div className="stat__lbl">운영자</div></div>
-          <div><div className="stat__n">4개월</div><div className="stat__lbl">평균 계약 기간</div></div>
+          <div><div className="stat__n">12년</div><div className="stat__lbl">개발 경력</div></div>
+          <div><div className="stat__n">100만+</div><div className="stat__lbl">대표작 누적 다운로드</div></div>
+          <div><div className="stat__n">1</div><div className="stat__lbl">풀스택 운영자</div></div>
+          <div><div className="stat__n">AI</div><div className="stat__lbl">기반 1인 완주</div></div>
         </div>
       </section>
     </main>
@@ -111,9 +104,8 @@ function Services({ onNav }) {
             작동하는 프로덕트를 만듭니다.
           </h1>
           <div className="page-head__meta">
-            <div className="row"><span>업무 범위</span><span>4가지</span></div>
-            <div className="row"><span>최소 계약</span><span>4주 · 800만원</span></div>
-            <div className="row"><span>가용성</span><span>2026 3분기 · 1건</span></div>
+            <div className="row"><span>업무 범위</span><span>모바일 · 백엔드 · 웹 · 인프라</span></div>
+            <div className="row"><span>운영 방식</span><span>AI 도구 활용 1인 풀스택</span></div>
           </div>
         </div>
       </section>
@@ -161,17 +153,17 @@ function Services({ onNav }) {
 // ─────────────────────────── Portfolio (mixed magazine layout)
 function Work({ onNav }) {
   const ps = window.PROJECTS;
-  // Magazine layout pattern: hero (xl) → lg+md → sm+sm offset → lg+md → xl
-  const layout = [
-    { p: ps[0], cls: "mag__item--xl" },
-    { p: ps[1], cls: "mag__item--lg" },
-    { p: ps[2], cls: "mag__item--md mag__item--offset" },
-    { p: ps[3], cls: "mag__item--sm" },
-    { p: ps[4], cls: "mag__item--sm mag__item--offset" },
-    { p: ps[5], cls: "mag__item--md" },
-    { p: ps[6], cls: "mag__item--lg mag__item--offset" },
-    { p: ps[7], cls: "mag__item--xl" },
+  // Magazine layout pattern: cycles through size classes for any number of projects
+  const pattern = [
+    "mag__item--xl",
+    "mag__item--lg",
+    "mag__item--md mag__item--offset",
+    "mag__item--sm",
+    "mag__item--sm mag__item--offset",
+    "mag__item--md",
+    "mag__item--lg mag__item--offset",
   ];
+  const layout = ps.map((p, i) => ({ p, cls: pattern[i % pattern.length] }));
 
   return (
     <main>
@@ -179,12 +171,12 @@ function Work({ onNav }) {
         <div className="page-head">
           <span className="page-head__num">— 04</span>
           <h1 className="display page-head__title">
-            2018년부터 만들어 온 작업들.
+            실제로 운영되는 프로덕트들.
           </h1>
           <div className="page-head__meta">
-            <div className="row"><span>총</span><span>24개 프로젝트</span></div>
-            <div className="row"><span>표시</span><span>8개 선정</span></div>
-            <div className="row"><span>필터</span><span>전체</span></div>
+            <div className="row"><span>주요</span><span>{window.PROJECTS.length}개 선정</span></div>
+            <div className="row"><span>분야</span><span>모바일 앱 · 백엔드 · 웹</span></div>
+            <div className="row"><span>플랫폼</span><span>크몽 · 위시켓 · 직접 연락</span></div>
           </div>
         </div>
       </section>
@@ -197,6 +189,7 @@ function Work({ onNav }) {
                onClick={(e)=>{e.preventDefault(); onNav("work/"+p.id);}}
                data-cursor="drag" data-cursor-label="Open">
               <div className="mag__media">
+                {p.image && <img className={"mag__img" + (p.imageOrient === "landscape" ? " mag__img--wide" : "")} src={p.image} alt={p.titleEn} loading="lazy" />}
                 <div className="ph">{p.titleEn.toUpperCase()} · {p.year}</div>
               </div>
               <div className="mag__head">
@@ -217,6 +210,23 @@ function Work({ onNav }) {
 function WorkDetail({ id, onNav }) {
   const p = window.PROJECTS.find(x => x.id === id) || window.PROJECTS[0];
   const next = window.PROJECTS[(window.PROJECTS.indexOf(p) + 1) % window.PROJECTS.length];
+  const [lightboxIdx, setLightboxIdx] = useS(-1);
+  const gallery = p.images || (p.image ? [p.image] : []);
+
+  useE(() => {
+    if (lightboxIdx < 0) return;
+    const onKey = (e) => {
+      if (e.key === "Escape") setLightboxIdx(-1);
+      else if (e.key === "ArrowRight") setLightboxIdx(i => (i + 1) % gallery.length);
+      else if (e.key === "ArrowLeft") setLightboxIdx(i => (i - 1 + gallery.length) % gallery.length);
+    };
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [lightboxIdx, gallery.length]);
   return (
     <main>
       <section className="wrap">
@@ -235,6 +245,15 @@ function WorkDetail({ id, onNav }) {
       </section>
 
       <section className="case-hero">
+        {p.image && (
+          <img
+            className={"case-hero__img" + (p.imageOrient === "landscape" ? " case-hero__img--wide" : "")}
+            src={p.image}
+            alt={p.titleEn}
+            style={{ cursor: "zoom-in" }}
+            onClick={() => setLightboxIdx(gallery.indexOf(p.image) >= 0 ? gallery.indexOf(p.image) : 0)}
+          />
+        )}
         <div className="ph">{p.titleEn} — 키 비주얼</div>
       </section>
 
@@ -247,34 +266,70 @@ function WorkDetail({ id, onNav }) {
 
       <section className="wrap case-content">
         <div className="label">개요</div>
-        <p className="body">{p.desc} 우리는 클라이언트의 비즈니스 가설을 처음부터 다시 들여다봤습니다. 정성·정량 리서치를 한 번 더 거친 뒤 컨셉 → 디자인 → 빌드 → 그로스 사이클을 같은 팀으로 한 번에 돌렸습니다.</p>
+        <p className="body">{p.desc}</p>
       </section>
 
-      <section className="case-frame">
-        <div className="ph">DESIGN SHOT · 01 — DASHBOARD</div>
-      </section>
+      {p.images && p.images.length > 0 ? (
+        <section className="wrap">
+          <div className={"case-gallery" + (p.imageOrient === "landscape" ? " case-gallery--wide" : "")}>
+            {p.images.map((src, i) => (
+              <button
+                type="button"
+                className="case-gallery__item"
+                key={i}
+                onClick={() => setLightboxIdx(i)}
+                aria-label={"이미지 " + (i+1) + " 크게 보기"}
+              >
+                <img src={src} alt={p.titleEn + " screenshot " + (i+1)} loading="lazy" />
+              </button>
+            ))}
+          </div>
+        </section>
+      ) : (
+        <section className="case-frame">
+          <div className="ph">{p.titleEn} — DESIGN SHOT</div>
+        </section>
+      )}
+
+      {lightboxIdx >= 0 && (
+        <div className="lightbox" onClick={() => setLightboxIdx(-1)} role="dialog" aria-modal="true">
+          <button
+            type="button"
+            className="lightbox__close"
+            onClick={(e) => { e.stopPropagation(); setLightboxIdx(-1); }}
+            aria-label="닫기"
+          >✕</button>
+          {gallery.length > 1 && (
+            <>
+              <button
+                type="button"
+                className="lightbox__nav lightbox__nav--prev"
+                onClick={(e) => { e.stopPropagation(); setLightboxIdx(i => (i - 1 + gallery.length) % gallery.length); }}
+                aria-label="이전"
+              >‹</button>
+              <button
+                type="button"
+                className="lightbox__nav lightbox__nav--next"
+                onClick={(e) => { e.stopPropagation(); setLightboxIdx(i => (i + 1) % gallery.length); }}
+                aria-label="다음"
+              >›</button>
+            </>
+          )}
+          <img
+            className="lightbox__img"
+            src={gallery[lightboxIdx]}
+            alt={p.titleEn + " " + (lightboxIdx+1)}
+            onClick={(e) => e.stopPropagation()}
+          />
+          {gallery.length > 1 && (
+            <div className="lightbox__counter">{lightboxIdx + 1} / {gallery.length}</div>
+          )}
+        </div>
+      )}
 
       <section className="wrap case-content">
-        <div className="label">접근</div>
-        <p className="body">
-          가장 먼저 한 일은 화면 수를 절반으로 줄이는 것이었습니다. 핵심 사용자가 매일 마주하는 4개의 모먼트에 집중하기 위해, 나머지는 컨텍스츄얼 모달로 미뤘습니다. 디자인 시스템은 가장 작은 그리드 단위에서 출발해 — 8px의 배수, 두 단계의 타이포 스케일, 두 종의 컴포넌트 변종 — 다양한 화면을 한 시스템으로 흡수했습니다.
-        </p>
-      </section>
-
-      <section className="wrap case-2up">
-        <div className="case-frame"><div className="ph">DETAIL · A</div></div>
-        <div className="case-frame"><div className="ph">DETAIL · B</div></div>
-      </section>
-
-      <section className="wrap case-content">
-        <div className="label">결과</div>
-        <p className="body">
-          출시 후 12주 만에 핵심 지표(주간 활성 사용자)는 약 2.6배가 되었고, 사용자 1인당 평균 체류 시간은 4분 22초에서 7분 41초로 늘었습니다. 무엇보다, 클라이언트의 내부 팀이 우리가 만든 시스템으로 다음 분기 기능을 자력으로 추가할 수 있게 되었습니다.
-        </p>
-      </section>
-
-      <section className="case-frame">
-        <div className="ph">FULL-BLEED RESULT · MOCK</div>
+        <div className="label">스택</div>
+        <p className="body">{p.chips.join(" · ")}</p>
       </section>
 
       <section className="wrap case-content">
@@ -377,7 +432,7 @@ function Quote({ onNav }) {
         </h1>
         <div className="page-head__meta">
           <div className="row"><span>단계</span><span>{step+1} / {QUOTE_STEPS.length}</span></div>
-          <div className="row"><span>회신</span><span>1 영업일 이내</span></div>
+          <div className="row"><span>연락</span><span>언제든 편하게</span></div>
         </div>
       </div>
 
@@ -439,43 +494,39 @@ function Contact({ onNav }) {
             인사 나눠요.
           </h1>
           <div className="page-head__meta">
-            <div className="row"><span>회신</span><span>24시간 이내</span></div>
-            <div className="row"><span>가용성</span><span>2026 3분기</span></div>
+            <div className="row"><span>연락</span><span>언제든 편하게</span></div>
+            <div className="row"><span>회신</span><span>가능한 빠르게</span></div>
           </div>
         </div>
 
         <p className="contact-big">
-          hello@ghplanet.studio
+          <a href="mailto:me@ghyeok.io" style={{color:"inherit", textDecoration:"none"}}>me@ghyeok.io</a>
         </p>
 
         <div className="contact-grid">
           <div className="col">
             <h3>프로젝트 의뢰</h3>
-            <p className="email">hello@ghplanet.studio</p>
+            <p className="email"><a href="mailto:me@ghyeok.io" style={{color:"inherit"}}>me@ghyeok.io</a></p>
             <p style={{ color: "var(--mute)", marginTop: 8 }}>새로운 프로젝트 / 견적</p>
           </div>
           <div className="col">
-            <h3>프레스 · 강연</h3>
-            <p className="email">press@ghplanet.studio</p>
-            <p style={{ color: "var(--mute)", marginTop: 8 }}>인터뷰 / 강연</p>
+            <h3>위시켓</h3>
+            <p className="email"><a href="https://www.wishket.com/partners/p/kh4975/" target="_blank" rel="noopener" style={{color:"inherit"}}>partners/p/kh4975</a></p>
+            <p style={{ color: "var(--mute)", marginTop: 8 }}>위시켓 파트너 프로필</p>
           </div>
           <div className="col">
-            <h3>콜라보 제안</h3>
-            <p className="email">collab@ghplanet.studio</p>
-            <p style={{ color: "var(--mute)", marginTop: 8 }}>같이 일해보고 싶다면</p>
+            <h3>크몽</h3>
+            <p className="email"><a href="https://kmong.com/@%EA%B6%8C%ED%98%81" target="_blank" rel="noopener" style={{color:"inherit"}}>kmong.com/@권혁</a></p>
+            <p style={{ color: "var(--mute)", marginTop: 8 }}>크몽 셀러 프로필</p>
           </div>
           <div className="col" style={{gridColumn:"span 12"}}><div style={{height:1, background:"var(--line)"}} /></div>
           <div className="col">
-            <h3>위치</h3>
-            <p>서울 · 원격 근무<br/>대면 미팅은 협의 후 진행</p>
+            <h3>GitHub</h3>
+            <p><a href="https://github.com/GwonHyeok" target="_blank" rel="noopener" style={{color:"inherit"}}>github.com/GwonHyeok</a></p>
           </div>
           <div className="col">
-            <h3>업무 시간</h3>
-            <p>월요일 — 금요일<br/>10:00 — 19:00 KST<br/>주말은 휴무입니다.</p>
-          </div>
-          <div className="col">
-            <h3>가용성</h3>
-            <p>2026 3분기 · 1건<br/>이후 일정은 협의 가능</p>
+            <h3>연락</h3>
+            <p>요일·시간 상관없이<br/>언제든 편하게 연락 주세요</p>
           </div>
         </div>
       </section>

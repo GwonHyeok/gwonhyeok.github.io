@@ -234,6 +234,7 @@ function Featured({ projects, onNav }) {
         </div>
         <a className="ftd__media" href={"#work/"+p.id} onClick={go}>
           <div className={"ftd__art ftd__art--" + p.id} key={p.id}>
+            {p.image && <img className={"ftd__img" + (p.imageOrient === "landscape" ? " ftd__img--wide" : "")} src={p.image} alt={p.titleEn} loading="lazy" />}
             <span className="ftd__ph">{p.titleEn.toUpperCase()} · KEY VISUAL</span>
           </div>
         </a>
@@ -254,8 +255,7 @@ function Home({ onNav }) {
         <HeroSphere />
         <div className="wrap hero__inner">
           <div className="hero__top">
-            <span className="cap">1인 디지털 스튜디오 · 2018년부터</span>
-            <LiveStatus />
+            <span className="cap">1인 디지털 스튜디오 · 12년차 풀스택 개발자</span>
           </div>
 
           <h1 className="display hero__title">
@@ -265,8 +265,8 @@ function Home({ onNav }) {
 
           <div className="hero__bot">
             <p className="hero__lead body-lg">
-              GHPlanet은 권혁이 운영하는 1인 디지털 스튜디오입니다.
-              기획부터 디자인, 개발, 운영까지 — 한 사람의 일관된 결정으로 프로덕트를 만듭니다.
+              GHPlanet은 12년차 풀스택 개발자 권혁이 운영하는 1인 디지털 스튜디오입니다.
+              기획부터 디자인, 앱·백엔드·인프라·운영까지 — AI를 도구로 한 사람이 끝까지 책임집니다.
             </p>
             <MagneticCta onClick={goQuote}>
               <span>프로젝트 의뢰</span>
