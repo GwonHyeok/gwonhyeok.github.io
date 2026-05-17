@@ -5,38 +5,77 @@ const { useState: useS, useEffect: useE, useMemo: useM } = React;
 function About({ onNav }) {
   return (
     <main>
-      <section className="wrap">
-        <div className="page-head">
-          <span className="page-head__num">— 02</span>
-          <h1 className="display page-head__title">
-            1인 디지털 스튜디오.
-          </h1>
-          <div className="page-head__meta">
-            <div className="row"><span>사업자 등록</span><span>2021.11.24</span></div>
-            <div className="row"><span>경력</span><span>12년차 풀스택 개발자</span></div>
-            <div className="row"><span>위치</span><span>원격 협업</span></div>
-            <div className="row"><span>분야</span><span>모바일 앱 · 백엔드 · 웹 · AI</span></div>
+      <section className="wrap about-hero">
+        <span className="cap about-hero__cap">— 02 / 소개</span>
+        <h1 className="display about-hero__title">
+          12년차 풀스택 개발자의<br/>1인 디지털 스튜디오.
+        </h1>
+        <p className="about-hero__lead">
+          GHPlanet은 권혁(GHyeok)이 운영하는 1인 디지털 스튜디오입니다.
+          의사결정자가 한 명이라 전달 손실 없이 빠르고 일관됩니다.
+          AI를 도구로 외부 협업자 없이 1인이 모바일·웹·백엔드·인프라를 완주합니다.
+        </p>
+        <div className="about-hero__chips">
+          <span>Flutter</span><span>iOS · Android</span>
+          <span>NestJS</span><span>Node.js · Go · Python</span>
+          <span>Next.js · React · Vue</span>
+          <span>PostgreSQL · MongoDB</span>
+          <span>AWS · GCP · K8s · Terraform</span>
+          <span>GraphQL · REST</span>
+          <span>Firebase · Agora · Twilio</span>
+        </div>
+      </section>
+
+      <section className="wrap about-card">
+        <div className="about-card__photo founder__pf founder__pf--dev">
+          <div className="founder__pf-grid" aria-hidden />
+          <div className="founder__pf-code" aria-hidden>
+            <span>$ whoami</span>
+            <span className="prompt">→ GHyeok</span>
+            <span>$ stack</span>
+            <span className="prompt">→ Flutter · NestJS · Next.js</span>
+            <span>$ years</span>
+            <span className="prompt">→ 12</span>
+            <span className="cursor">_</span>
+          </div>
+          <img className="founder__pf-img" src="profile/me.png" alt="GHyeok 권혁" />
+          <div className="founder__pf-badge" aria-hidden>
+            <span className="dot" /> ONLINE
+          </div>
+        </div>
+        <div className="about-card__body">
+          <div className="about-card__head">
+            <div className="about-card__name">권혁 · GHyeok</div>
+            <div className="about-card__role">12년차 풀스택 개발자 · Founder of GHPlanet</div>
+          </div>
+          <dl className="about-card__meta">
+            <div><dt>사업자 등록</dt><dd>2021.11.24 · 589-11-01997</dd></div>
+            <div><dt>개발 경력</dt><dd>12년 (2014~)</dd></div>
+            <div><dt>위치</dt><dd>원격 협업</dd></div>
+            <div><dt>분야</dt><dd>모바일 · 백엔드 · 웹 · 인프라 · AI</dd></div>
+          </dl>
+          <div className="about-card__bio">
+            <p>2014년부터 모바일 앱·백엔드·웹을 만들어 온 12년차 풀스택 개발자입니다.</p>
+            <p>
+              <b>최근 작업.</b> 캐시백·리워드 플랫폼 <b>TUK</b>(Flutter 앱 + NestJS API + Next.js 어드민 + K8s·Terraform 인프라 1인 풀스택),
+              키즈 전문가 매칭 글로벌 서비스 <b>모든별키즈</b>(Next.js · i18n),
+              자체 운영 북마크 앱 <b>Pinned!</b>(iOS · Android 네이티브).
+            </p>
+            <p>
+              <b>그동안의 결과물.</b> 데이코어 <b>짐데이</b>(누적 100만 다운로드, PHP→Node.js 마이그레이션 · Aurora Serverless · 1,000만 운동 데이터 기반 추천 AI),
+              라이프에이드 <b>피지컬갤러리 Pro</b>(300만 구독자 채널 기반, 동시접속 2,500+ 대응),
+              용감한컴퍼니 <b>이파마스터·아나토미마스터</b>(약학·해부학 학습앱),
+              놀잇 <b>실시간 영상 채팅</b>(Agora · Firebase),
+              소울톡 <b>온라인 타로 상담</b>(Firestore · Agora).
+            </p>
+            <p>앱·서버·웹·인프라·운영을 한 사람이 책임집니다. AI를 도구로 외부 협업자 없이 1인이 풀스택을 완주합니다.</p>
           </div>
         </div>
       </section>
 
       <section className="sec wrap">
         <div className="sec__head">
-          <span className="cap sec__num">A.01 — 소개</span>
-          <h2 className="h2 sec__title">
-            기획, 디자인, 개발이 한 사람에게서 나옵니다.
-          </h2>
-        </div>
-        <p className="statement">
-          GHPlanet은 권혁이 운영하는 1인 스튜디오입니다.
-          의사결정자가 한 명이라 전달 손실 없이 일관되고 빠릅니다.
-          필요한 영역은 수년간 같이 일해 온 외부 전문가와 함께 송달합니다.
-        </p>
-      </section>
-
-      <section className="sec wrap">
-        <div className="sec__head">
-          <span className="cap sec__num">A.02 — 원칙</span>
+          <span className="cap sec__num">— 원칙</span>
           <h2 className="h2 sec__title">일하는 네 가지 원칙.</h2>
         </div>
         <div className="process">
@@ -52,32 +91,6 @@ function About({ onNav }) {
               <div className="step__d">{s.d}</div>
             </div>
           ))}
-        </div>
-      </section>
-
-      <section className="sec wrap">
-        <div className="sec__head">
-          <span className="cap sec__num">A.03 — 운영자</span>
-          <h2 className="h2 sec__title">한 사람이 전부 책임집니다.</h2>
-          <p className="sec__aside body">기획·디자인·앱·백엔드·인프라·운영까지. AI를 도구로 외부 협업자 없이 1인 풀스택으로 완주합니다.</p>
-        </div>
-        <div className="about-people">
-          <div className="founder">
-            <div className="founder__pf"><div className="ph">프로필</div></div>
-            <div className="founder__head">
-              <div className="founder__name">권혁 · GHyeok</div>
-              <div className="founder__role">12년차 풀스택 개발자 · Founder</div>
-            </div>
-            <p className="founder__bio">
-              2014년부터 모바일 앱·백엔드·웹을 만들어 온 12년차 풀스택 개발자입니다.
-              <br/><br/>
-              <b>최근 작업.</b> 캐시백·리워드 플랫폼 <b>TUK</b>(Flutter 앱 + NestJS API + Next.js 어드민 + K8s/Terraform 인프라 1인 풀스택), 키즈 전문가 매칭 글로벌 서비스 <b>모든별키즈</b>(Next.js·i18n), 자체 운영 중인 북마크 앱 <b>Pinned!</b>(iOS·Android 네이티브).
-              <br/><br/>
-              <b>그동안의 결과물.</b> 데이코어 <b>짐데이</b>(누적 100만 다운로드, PHP→Node.js 마이그레이션 · Aurora Serverless · 1,000만 운동 데이터 기반 추천 AI), 라이프에이드 <b>피지컬갤러리 Pro</b>(300만 구독자 채널 기반, 동시접속 2,500+ 대응), 용감한컴퍼니 <b>이파마스터·아나토미마스터</b>(약학·해부학 학습앱), 놀잇 <b>실시간 영상 채팅</b>(Agora·Firebase), 소울톡 <b>온라인 타로 상담</b>(Firestore·Agora).
-              <br/><br/>
-              앱·서버·웹·인프라·운영을 한 사람이 책임집니다. 의사결정자가 한 명이라 빠르고 일관되며, AI를 도구로 외부 협업자 없이 1인이 풀스택을 완주합니다.
-            </p>
-          </div>
         </div>
       </section>
 
@@ -176,7 +189,7 @@ function Work({ onNav }) {
           <div className="page-head__meta">
             <div className="row"><span>주요</span><span>{window.PROJECTS.length}개 선정</span></div>
             <div className="row"><span>분야</span><span>모바일 앱 · 백엔드 · 웹</span></div>
-            <div className="row"><span>플랫폼</span><span>크몽 · 위시켓 · 직접 연락</span></div>
+            <div className="row"><span>방식</span><span>1인 풀스택 운영</span></div>
           </div>
         </div>
       </section>
@@ -374,6 +387,37 @@ function Quote({ onNav }) {
 
   const cur = QUOTE_STEPS[step];
 
+  const buildMailto = () => {
+    const labelFor = (k) => {
+      const map = { type: "프로덕트 종류", stage: "현재 단계", budget: "예상 예산", timeline: "희망 일정" };
+      return map[k] || k;
+    };
+    const lines = [];
+    QUOTE_STEPS.forEach(s => {
+      if (s.form) return;
+      const v = ans[s.key];
+      if (!v) return;
+      lines.push(`${labelFor(s.key)}: ${Array.isArray(v) ? v.join(", ") : v}`);
+    });
+    lines.push("");
+    lines.push(`이름: ${ans.name || ""}`);
+    lines.push(`회사/팀: ${ans.company || ""}`);
+    lines.push(`이메일: ${ans.email || ""}`);
+    if (ans.notes) {
+      lines.push("");
+      lines.push("메모:");
+      lines.push(ans.notes);
+    }
+    const subject = `[GHPlanet 프로젝트 의뢰] ${ans.name || ""} · ${ans.company || ""}`.trim();
+    const body = lines.join("\n");
+    return `mailto:me@ghyeok.io?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  };
+
+  const submit = () => {
+    window.location.href = buildMailto();
+    setDone(true);
+  };
+
   const pick = (opt) => {
     setAns(a => {
       const next = { ...a };
@@ -401,8 +445,19 @@ function Quote({ onNav }) {
         <div className="quote__step">
           <span className="quote__num">— 완료</span>
           <div className="quote__q">
-            <h2>요청이 도착했습니다.</h2>
-            <p>1영업일 안에 직접 연락드립니다. 그동안 다른 작업도 한번 둘러보세요.</p>
+            <h2>메일 앱이 열렸나요?</h2>
+            <p>
+              입력하신 내용으로 <b>me@ghyeok.io</b> 앞으로 메일이 미리 작성됩니다.
+              내용을 확인하고 <b>‘보내기’</b>를 눌러주시면 도착합니다.
+              가능한 빠르게 답장드릴게요.
+            </p>
+            <p style={{color:"var(--mute)", marginTop:24, fontSize:14}}>
+              메일 앱이 안 열렸나요?{" "}
+              <a href={buildMailto()} style={{color:"var(--ink)", textDecoration:"underline"}}>다시 열기</a>
+              {" 또는 "}
+              <a href="mailto:me@ghyeok.io" style={{color:"var(--ink)", textDecoration:"underline"}}>me@ghyeok.io</a>
+              로 직접 보내주세요.
+            </p>
             <div style={{display:"flex", gap:12, marginTop:36}}>
               <a className="opt" href="#work" style={{flex:1}} onClick={(e)=>{e.preventDefault(); onNav("work");}}>
                 포트폴리오 보기 <span className="num">→</span>
@@ -413,9 +468,9 @@ function Quote({ onNav }) {
             </div>
           </div>
           <div className="quote__a">
-            <div className="cap">접수 번호</div>
-            <div className="display" style={{fontSize:"clamp(56px,11vw,180px)", letterSpacing:"-0.04em"}}>
-              {"GHP-" + Math.floor(10000 + Math.random()*89999)}
+            <div className="cap">받는 사람</div>
+            <div className="display" style={{fontSize:"clamp(32px,5.5vw,72px)", letterSpacing:"-0.03em", wordBreak:"break-all"}}>
+              me@ghyeok.io
             </div>
           </div>
         </div>
@@ -474,9 +529,9 @@ function Quote({ onNav }) {
           ← 이전
         </button>
         <button className="quote__btn quote__btn--primary" disabled={!canNext}
-                onClick={()=>{ if (step === QUOTE_STEPS.length - 1) setDone(true); else setStep(s=>s+1); }}
+                onClick={()=>{ if (step === QUOTE_STEPS.length - 1) submit(); else setStep(s=>s+1); }}
                 data-cursor={canNext ? "link" : ""} data-cursor-label={step===QUOTE_STEPS.length-1?"제출":"다음"}>
-          {step === QUOTE_STEPS.length - 1 ? "제출하기" : "다음 단계"} →
+          {step === QUOTE_STEPS.length - 1 ? "메일로 보내기" : "다음 단계"} →
         </button>
       </div>
     </main>
@@ -485,6 +540,10 @@ function Quote({ onNav }) {
 
 // ─────────────────────────── Contact
 function Contact({ onNav }) {
+  const channels = [
+    { lbl: "이메일", val: "me@ghyeok.io", sub: "가장 빠르게 도착합니다", href: "mailto:me@ghyeok.io" },
+    { lbl: "GitHub", val: "github.com/GwonHyeok", sub: "오픈소스 · 작업 흔적", href: "https://github.com/GwonHyeok", external: true },
+  ];
   return (
     <main>
       <section className="wrap">
@@ -498,36 +557,33 @@ function Contact({ onNav }) {
             <div className="row"><span>회신</span><span>가능한 빠르게</span></div>
           </div>
         </div>
+      </section>
 
-        <p className="contact-big">
-          <a href="mailto:me@ghyeok.io" style={{color:"inherit", textDecoration:"none"}}>me@ghyeok.io</a>
-        </p>
-
-        <div className="contact-grid">
-          <div className="col">
-            <h3>프로젝트 의뢰</h3>
-            <p className="email"><a href="mailto:me@ghyeok.io" style={{color:"inherit"}}>me@ghyeok.io</a></p>
-            <p style={{ color: "var(--mute)", marginTop: 8 }}>새로운 프로젝트 / 견적</p>
-          </div>
-          <div className="col">
-            <h3>위시켓</h3>
-            <p className="email"><a href="https://www.wishket.com/partners/p/kh4975/" target="_blank" rel="noopener" style={{color:"inherit"}}>partners/p/kh4975</a></p>
-            <p style={{ color: "var(--mute)", marginTop: 8 }}>위시켓 파트너 프로필</p>
-          </div>
-          <div className="col">
-            <h3>크몽</h3>
-            <p className="email"><a href="https://kmong.com/@%EA%B6%8C%ED%98%81" target="_blank" rel="noopener" style={{color:"inherit"}}>kmong.com/@권혁</a></p>
-            <p style={{ color: "var(--mute)", marginTop: 8 }}>크몽 셀러 프로필</p>
-          </div>
-          <div className="col" style={{gridColumn:"span 12"}}><div style={{height:1, background:"var(--line)"}} /></div>
-          <div className="col">
-            <h3>GitHub</h3>
-            <p><a href="https://github.com/GwonHyeok" target="_blank" rel="noopener" style={{color:"inherit"}}>github.com/GwonHyeok</a></p>
-          </div>
-          <div className="col">
-            <h3>연락</h3>
-            <p>요일·시간 상관없이<br/>언제든 편하게 연락 주세요</p>
-          </div>
+      <section className="sec wrap">
+        <div className="sec__head">
+          <span className="cap sec__num">— 채널</span>
+          <h2 className="h2 sec__title">어디로든 닿을 수 있어요.</h2>
+          <p className="sec__aside body">
+            새로운 프로덕트, 운영 중인 서비스 고도화, 짧은 자문도 환영합니다.
+            요일·시간 상관없이 편한 시간에 연락 주세요.
+          </p>
+        </div>
+        <div className="ch-list">
+          {channels.map((c, i) => (
+            <a
+              key={c.lbl}
+              className="ch-row"
+              href={c.href}
+              {...(c.external ? { target: "_blank", rel: "noopener" } : {})}
+              data-cursor="link"
+            >
+              <span className="ch-row__idx">— {String(i+1).padStart(2,"0")}</span>
+              <span className="ch-row__lbl">{c.lbl}</span>
+              <span className="ch-row__val">{c.val}</span>
+              <span className="ch-row__sub">{c.sub}</span>
+              <span className="ch-row__arrow" aria-hidden>↗</span>
+            </a>
+          ))}
         </div>
       </section>
     </main>

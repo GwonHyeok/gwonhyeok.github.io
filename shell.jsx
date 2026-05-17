@@ -144,11 +144,6 @@ function Footer({ onNav }) {
           <p>언제든 편하게 연락 주세요</p>
         </div>
         <div className="footer__col">
-          <h4>플랫폼</h4>
-          <a href="https://www.wishket.com/partners/p/kh4975/" target="_blank" rel="noopener" data-cursor="link" data-cursor-label="↗">Wishket · kh4975</a>
-          <a href="https://kmong.com/@%EA%B6%8C%ED%98%81" target="_blank" rel="noopener" data-cursor="link" data-cursor-label="↗">Kmong · 권혁</a>
-        </div>
-        <div className="footer__col">
           <h4>코드</h4>
           <a href="https://github.com/GwonHyeok" target="_blank" rel="noopener" data-cursor="link" data-cursor-label="↗">GitHub · GwonHyeok</a>
         </div>
