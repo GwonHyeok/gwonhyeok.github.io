@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>가짜뉴스 제보 웹사이트 신규 구축 — 제안서</title>
+<meta name="description" content="제보형 웹사이트 + 관리자 백오피스 + 알림톡 연동 신규 구축 제안서. 권혁 (10년차 풀스택).">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --ink: #0c0e10; --ink-2: #2b2f33; --muted: #6b7178; --line: #e6e8ec; --bg: #fafaf8; --paper: #ffffff; --accent-bg: #f1f1ed; --brand: #2563eb; --ok: #16a34a; --warn: #d97706; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: 'Inter', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 15px; line-height: 1.65; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  .page { max-width: 860px; margin: 0 auto; background: var(--paper); padding: 72px 64px 96px; border-left: 1px solid var(--line); border-right: 1px solid var(--line); min-height: 100vh; }
+  header.cover { border-bottom: 1px solid var(--line); padding-bottom: 28px; margin-bottom: 40px; }
+  .eyebrow { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  h1 { font-size: 30px; line-height: 1.25; font-weight: 700; margin: 0 0 14px; letter-spacing: -0.01em; }
+  .meta { display: flex; flex-wrap: wrap; gap: 24px; font-size: 13px; color: var(--muted); }
+  .meta b { color: var(--ink-2); font-weight: 500; }
+  h2 { font-size: 18px; font-weight: 700; margin: 48px 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--line); letter-spacing: -0.005em; }
+  h3 { font-size: 15px; font-weight: 600; margin: 28px 0 10px; }
+  p { margin: 10px 0; }
+  ul { padding-left: 20px; margin: 10px 0; }
+  li { margin: 4px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+  th, td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+  th { font-weight: 600; background: var(--accent-bg); font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-2); }
+  .callout { border: 1px solid var(--line); background: var(--accent-bg); padding: 14px 18px; margin: 18px 0; font-size: 14px; border-radius: 2px; }
+  .price { font-size: 22px; font-weight: 700; }
+
+  /* Demo box */
+  .demo { border: 1px solid var(--line); margin: 18px 0; border-radius: 2px; }
+  .demo-head { padding: 14px 18px; background: var(--accent-bg); border-bottom: 1px solid var(--line); font-size: 13px; color: var(--ink-2); display: flex; justify-content: space-between; align-items: center; }
+  .demo-tag { font-size: 11px; padding: 3px 8px; background: var(--ink); color: white; letter-spacing: 0.06em; text-transform: uppercase; border-radius: 2px; }
+  .tabs { display: flex; border-bottom: 1px solid var(--line); }
+  .tabs button { flex: 1; padding: 12px 16px; background: white; border: 0; border-right: 1px solid var(--line); cursor: pointer; font-family: inherit; font-size: 13px; color: var(--muted); }
+  .tabs button:last-child { border-right: 0; }
+  .tabs button.active { background: var(--paper); color: var(--ink); font-weight: 600; border-bottom: 2px solid var(--ink); margin-bottom: -1px; }
+  .tab-pane { display: none; padding: 20px; background: #f6f7f9; }
+  .tab-pane.active { display: block; }
+
+  /* User form */
+  .form-card { background: white; border: 1px solid var(--line); padding: 20px; max-width: 480px; margin: 0 auto; border-radius: 2px; }
+  .form-card h4 { margin: 0 0 4px; font-size: 16px; }
+  .form-card .sub { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+  .role-toggle { display: flex; gap: 0; margin-bottom: 14px; border: 1px solid var(--line); border-radius: 2px; overflow: hidden; }
+  .role-toggle button { flex: 1; padding: 8px; background: white; border: 0; cursor: pointer; font-size: 12px; color: var(--muted); }
+  .role-toggle button.active { background: var(--ink); color: white; }
+  .field { margin-bottom: 12px; }
+  .field label { display: block; font-size: 12px; color: var(--ink-2); margin-bottom: 4px; font-weight: 500; }
+  .field input, .field textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--line); font-size: 13px; font-family: inherit; border-radius: 2px; }
+  .field textarea { resize: vertical; min-height: 70px; }
+  .upload-zone { border: 1px dashed #b8bdc4; padding: 14px; text-align: center; font-size: 12px; color: var(--muted); cursor: pointer; border-radius: 2px; }
+  .upload-zone:hover { background: var(--accent-bg); }
+  .preview-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 8px; }
+  .preview-grid div { aspect-ratio: 1; background: #ddd; border-radius: 2px; background-size: cover; background-position: center; position: relative; }
+  .preview-grid div span { position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.7); color: white; border-radius: 50%; width: 16px; height: 16px; font-size: 11px; line-height: 16px; text-align: center; cursor: pointer; }
+  .captcha { font-size: 12px; padding: 8px 10px; background: var(--accent-bg); border: 1px solid var(--line); border-radius: 2px; display: flex; align-items: center; gap: 8px; }
+  .btn { width: 100%; padding: 11px; background: var(--ink); color: white; border: 0; font-size: 14px; font-weight: 600; cursor: pointer; border-radius: 2px; font-family: inherit; }
+  .btn:hover { background: var(--ink-2); }
+  .btn.secondary { background: white; color: var(--ink); border: 1px solid var(--line); }
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--ink); color: white; padding: 12px 20px; border-radius: 4px; font-size: 13px; z-index: 100; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+
+  /* Admin */
+  .admin-layout { background: white; border: 1px solid var(--line); }
+  .admin-header { padding: 12px 16px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+  .admin-header b { font-weight: 600; }
+  .admin-table { font-size: 12.5px; }
+  .admin-table table { margin: 0; }
+  .admin-table tbody tr { cursor: pointer; }
+  .admin-table tbody tr:hover { background: var(--accent-bg); }
+  .badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 500; }
+  .badge.new { background: #fef3c7; color: #92400e; }
+  .badge.review { background: #dbeafe; color: #1e40af; }
+  .badge.done { background: #dcfce7; color: #15803d; }
+  .badge.hidden { background: #f3f4f6; color: #6b7280; }
+  .detail-panel { padding: 16px; background: #f6f7f9; display: none; border-top: 1px solid var(--line); }
+  .detail-panel.show { display: block; }
+  .detail-panel h5 { margin: 0 0 10px; font-size: 14px; }
+  .detail-row { display: grid; grid-template-columns: 110px 1fr; gap: 8px; padding: 6px 0; font-size: 13px; border-bottom: 1px solid var(--line); }
+  .detail-row label { color: var(--muted); font-size: 12px; }
+  .actions { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+  .actions button { font-size: 12px; padding: 6px 10px; border: 1px solid var(--line); background: white; cursor: pointer; border-radius: 2px; font-family: inherit; }
+  .actions button:hover { background: var(--accent-bg); }
+  .actions button.primary { background: var(--ink); color: white; border-color: var(--ink); }
+  .alimtalk-preview { background: #fff8e6; border: 1px solid #f6cf6f; padding: 12px 14px; margin-top: 12px; border-radius: 6px; font-size: 13px; }
+  .alimtalk-preview .head { font-size: 11px; color: var(--warn); font-weight: 600; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
+
+  footer.foot { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; }
+  footer.foot a { color: var(--ink-2); text-decoration: none; border-bottom: 1px solid var(--line); }
+  @media (max-width: 720px) { .page { padding: 40px 22px 60px; border: none; } h1 { font-size: 24px; } .meta { gap: 12px; flex-direction: column; } .preview-grid { grid-template-columns: repeat(3, 1fr); } }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="cover">
+  <div class="eyebrow">제안서 · Wishket #155416</div>
+  <h1>가짜뉴스 및 허위사실 제보 웹사이트 신규 구축</h1>
+  <div class="meta">
+    <span><b>제안자</b> 권혁 (10년차 풀스택)</span>
+    <span><b>제안</b> 7,600,000원</span>
+    <span><b>기간</b> 45일</span>
+  </div>
+</header>
+
+<section>
+  <h2>1. 한 줄 요약</h2>
+  <p>
+    제보형 사이트의 핵심 흐름(<b>회원/비회원 분리 제보 → 관리자 검토 → 알림톡 피드백</b>)을
+    제안서 안에서 바로 클릭해보실 수 있도록 <b>동작하는 mockup</b>으로 만들어두었습니다.
+    아래 데모는 실제 폼·관리자 흐름이 어떤 UX로 풀려야 하는지 빠르게 보여드리는 용도입니다.
+  </p>
+</section>
+
+<section>
+  <h2>2. 인터랙티브 데모 — 제보 → 관리자 → 알림톡까지</h2>
+  <div class="demo">
+    <div class="demo-head">
+      <span><b>제보 시스템 동작 mockup</b> · 사용자 + 관리자 시뮬레이션</span>
+      <span class="demo-tag">Live</span>
+    </div>
+    <div class="tabs">
+      <button id="tabUser" class="active">① 사용자 화면 — 제보 작성</button>
+      <button id="tabAdmin">② 관리자 화면 — 처리</button>
+    </div>
+
+    <div id="paneUser" class="tab-pane active">
+      <div class="form-card">
+        <h4>가짜뉴스·허위사실 제보</h4>
+        <div class="sub">로그인 없이도 제보 가능합니다. 처리 결과는 입력하신 연락처로 알려드립니다.</div>
+
+        <div class="role-toggle">
+          <button id="roleAnon" class="active">비회원 제보</button>
+          <button id="roleMember">회원 제보</button>
+        </div>
+
+        <div class="field">
+          <label>제목 *</label>
+          <input id="rTitle" type="text" placeholder="예: ○○ 후보 관련 SNS 허위 정보">
+        </div>
+        <div class="field">
+          <label>제보 내용 *</label>
+          <textarea id="rContent" placeholder="언제·어디서·어떤 내용으로 유포되고 있는지 적어주세요."></textarea>
+        </div>
+        <div class="field">
+          <label>관련 URL</label>
+          <input id="rUrl" type="url" placeholder="https://">
+        </div>
+        <div class="field">
+          <label>이미지 (최대 4장 · 자동 압축)</label>
+          <label class="upload-zone" id="uploadZone">+ 이미지 추가</label>
+          <input type="file" id="uploadInput" accept="image/*" multiple style="display:none">
+          <div class="preview-grid" id="previewGrid"></div>
+        </div>
+        <div class="field" id="anonFields">
+          <label>알림 수신 연락처 (휴대전화) *</label>
+          <input id="rPhone" type="tel" placeholder="010-0000-0000">
+          <div style="font-size:11px; color:var(--muted); margin-top:4px;">개인정보 수집·이용에 동의합니다 (처리 결과 알림 목적 외 사용하지 않음)</div>
+        </div>
+        <div class="field">
+          <div class="captcha">
+            <input type="checkbox" id="rCaptcha">
+            <label for="rCaptcha" style="margin:0; font-size:12px;">사람입니다 (reCAPTCHA 자리)</label>
+          </div>
+        </div>
+        <button class="btn" id="submitReport">제보 등록</button>
+        <div style="text-align:center; margin-top:12px; font-size:12px; color:var(--muted);">
+          접수된 제보 <b id="totalCount">0</b>건 · 처리 진행 상황은 관리자 탭에서 확인하세요
+        </div>
+      </div>
+    </div>
+
+    <div id="paneAdmin" class="tab-pane">
+      <div class="admin-layout">
+        <div class="admin-header">
+          <span><b>관리자 백오피스</b> · 제보 리스트</span>
+          <span style="font-size:12px; color:var(--muted);">로그인: admin@news-watch.kr</span>
+        </div>
+        <div class="admin-table">
+          <table>
+            <thead>
+              <tr><th>접수일</th><th>제목</th><th>제보자</th><th>상태</th></tr>
+            </thead>
+            <tbody id="adminList"></tbody>
+          </table>
+        </div>
+        <div class="detail-panel" id="detail">
+          <h5 id="dTitle">—</h5>
+          <div class="detail-row"><label>제보 내용</label><div id="dContent">—</div></div>
+          <div class="detail-row"><label>관련 URL</label><div id="dUrl">—</div></div>
+          <div class="detail-row"><label>제보자</label><div id="dWho">—</div></div>
+          <div class="detail-row"><label>첨부 이미지</label><div id="dImgs">—</div></div>
+          <div class="detail-row"><label>현재 상태</label><div id="dStatus">—</div></div>
+          <div class="actions">
+            <button data-action="review">검토 중으로 변경</button>
+            <button data-action="done" class="primary">처리 완료 + 알림톡 발송</button>
+            <button data-action="hidden">비공개 처리</button>
+            <button data-action="delete">삭제</button>
+          </div>
+          <div id="alimtalk" style="display:none;" class="alimtalk-preview">
+            <div class="head">💬 카카오 알림톡 발송 시뮬레이션</div>
+            <div id="alimtalkBody"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p style="font-size:13px; color:var(--muted);">
+    실제 구축 시에는 위 mockup의 흐름을 그대로 따라가되, 백엔드는 정식 API/DB로,
+    알림톡은 카카오 비즈톡 API로, reCAPTCHA는 v3 score 기반 검증으로 대체됩니다.
+  </p>
+</section>
+
+<section>
+  <h2>3. 유사 도메인 경험</h2>
+  <ul>
+    <li><b>사용자 제보·후기 시스템</b>: 모든별키즈(대한민국 No.1 아동 발달 매칭 플랫폼)에서 보호자 후기/문의 접수, 관리자 모더레이션, 알림 발송 직접 구축</li>
+    <li><b>카카오 알림톡/SMS 연동</b>: 다수 서비스에 비즈톡 API + 발신 프로필 관리 적용</li>
+    <li><b>reCAPTCHA · 다중 이미지 압축</b>: 표준 적용 패턴 보유</li>
+    <li><b>개인정보 처리 흐름</b>: 비회원 제보의 동의/암호화/접근 로그 구조 운영 경험</li>
+  </ul>
+</section>
+
+<section>
+  <h2>4. 작업 범위</h2>
+  <table>
+    <thead><tr><th>구분</th><th>내용</th></tr></thead>
+    <tbody>
+      <tr><td>사용자 페이지</td><td>회원/비회원 분리 제보 폼, 다중 이미지(자동 압축), URL/텍스트, reCAPTCHA v3, 본인 제보 내역 열람, 동의 흐름</td></tr>
+      <tr><td>관리자 페이지</td><td>제보 워크플로(접수 → 검토 → 처리완료), 비공개 처리, 회원/권한 관리, 개별 알림톡/SMS 발송</td></tr>
+      <tr><td>인프라</td><td>클라우드 호스팅 + DB 암호화, 접근 로그, 백업 정책</td></tr>
+      <tr><td>외부 연동</td><td>카카오 비즈톡 알림톡, NHN/Naver SMS, reCAPTCHA v3, 소셜 로그인(검토)</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>5. 일정 (45일)</h2>
+  <table>
+    <thead><tr><th>주차</th><th>마일스톤</th></tr></thead>
+    <tbody>
+      <tr><td>1주차</td><td>요구사항 확정, 화면 흐름 + 와이어프레임</td></tr>
+      <tr><td>2~4주차</td><td>사용자/관리자 페이지 개발, 알림톡 연동</td></tr>
+      <tr><td>5~6주차</td><td>QA, 보안 점검, 인수인계</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>6. 견적 · 유지보수</h2>
+  <table>
+    <tbody>
+      <tr><td>제안 금액</td><td class="price">7,600,000원</td></tr>
+      <tr><td>제안 기간</td><td>45일</td></tr>
+      <tr><td>하자보수</td><td>런칭 후 3개월 무상</td></tr>
+      <tr><td>산출물</td><td>기획 문서 · 디자인 원본 · 소스 코드 · 운영 매뉴얼</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<footer class="foot">
+  <span>권혁 · 10년차 풀스택 + AI 서비스 개발자</span>
+  <a href="https://resume.ghyeok.io/">resume.ghyeok.io</a>
+</footer>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  const STORAGE_KEY = 'report-demo-v1';
+  let reports = [];
+  try { reports = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch (e) { reports = []; }
+
+  // Tabs
+  const tabUser = document.getElementById('tabUser');
+  const tabAdmin = document.getElementById('tabAdmin');
+  const paneUser = document.getElementById('paneUser');
+  const paneAdmin = document.getElementById('paneAdmin');
+  function switchTab(which) {
+    if (which === 'user') {
+      tabUser.classList.add('active'); tabAdmin.classList.remove('active');
+      paneUser.classList.add('active'); paneAdmin.classList.remove('active');
+    } else {
+      tabAdmin.classList.add('active'); tabUser.classList.remove('active');
+      paneAdmin.classList.add('active'); paneUser.classList.remove('active');
+      renderAdmin();
+    }
+  }
+  tabUser.addEventListener('click', () => switchTab('user'));
+  tabAdmin.addEventListener('click', () => switchTab('admin'));
+
+  // Role toggle
+  const roleAnon = document.getElementById('roleAnon');
+  const roleMember = document.getElementById('roleMember');
+  const anonFields = document.getElementById('anonFields');
+  let role = 'anon';
+  roleAnon.addEventListener('click', () => { role = 'anon'; roleAnon.classList.add('active'); roleMember.classList.remove('active'); anonFields.style.display = ''; });
+  roleMember.addEventListener('click', () => { role = 'member'; roleMember.classList.add('active'); roleAnon.classList.remove('active'); anonFields.style.display = 'none'; });
+
+  // Image upload (in-browser compression)
+  const uploadZone = document.getElementById('uploadZone');
+  const uploadInput = document.getElementById('uploadInput');
+  const previewGrid = document.getElementById('previewGrid');
+  let images = [];
+  uploadZone.addEventListener('click', () => uploadInput.click());
+  uploadInput.addEventListener('change', async (e) => {
+    const files = Array.from(e.target.files || []).slice(0, 4 - images.length);
+    for (const f of files) {
+      const url = await compressImage(f);
+      images.push(url);
+    }
+    renderPreviews();
+    uploadInput.value = '';
+  });
+  function renderPreviews() {
+    previewGrid.replaceChildren();
+    images.forEach((src, i) => {
+      const div = document.createElement('div');
+      div.style.backgroundImage = `url(${src})`;
+      const span = document.createElement('span');
+      span.textContent = '×';
+      span.addEventListener('click', (ev) => { ev.stopPropagation(); images.splice(i, 1); renderPreviews(); });
+      div.appendChild(span);
+      previewGrid.appendChild(div);
+    });
+  }
+  async function compressImage(file) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const max = 800;
+        let w = img.width, h = img.height;
+        if (w > max) { h = h * (max / w); w = max; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.7));
+      };
+      img.src = URL.createObjectURL(file);
+    });
+  }
+
+  // Toast
+  const toastEl = document.getElementById('toast');
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    setTimeout(() => toastEl.classList.remove('show'), 2200);
+  }
+
+  // Submit report
+  const totalCount = document.getElementById('totalCount');
+  function refreshCount() { totalCount.textContent = reports.length; }
+  refreshCount();
+
+  document.getElementById('submitReport').addEventListener('click', () => {
+    const title = document.getElementById('rTitle').value.trim();
+    const content = document.getElementById('rContent').value.trim();
+    const url = document.getElementById('rUrl').value.trim();
+    const phone = document.getElementById('rPhone').value.trim();
+    const captcha = document.getElementById('rCaptcha').checked;
+
+    if (!title || !content) { toast('제목과 내용을 입력하세요'); return; }
+    if (role === 'anon' && !phone) { toast('비회원 제보는 연락처가 필요합니다'); return; }
+    if (!captcha) { toast('reCAPTCHA를 체크해주세요'); return; }
+
+    const r = {
+      id: Date.now(),
+      title, content, url,
+      who: role === 'anon' ? ('비회원 ' + phone) : '회원 user@example.com',
+      phone: role === 'anon' ? phone : '010-1234-5678',
+      images: images.slice(),
+      status: 'new',
+      createdAt: new Date().toISOString(),
+    };
+    reports.unshift(r);
+    save();
+    toast('제보가 접수되었습니다');
+    document.getElementById('rTitle').value = '';
+    document.getElementById('rContent').value = '';
+    document.getElementById('rUrl').value = '';
+    document.getElementById('rPhone').value = '';
+    document.getElementById('rCaptcha').checked = false;
+    images = []; renderPreviews();
+    refreshCount();
+  });
+
+  function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(reports)); refreshCount(); }
+
+  // Admin
+  const adminList = document.getElementById('adminList');
+  const detail = document.getElementById('detail');
+  const dTitle = document.getElementById('dTitle');
+  const dContent = document.getElementById('dContent');
+  const dUrl = document.getElementById('dUrl');
+  const dWho = document.getElementById('dWho');
+  const dImgs = document.getElementById('dImgs');
+  const dStatusEl = document.getElementById('dStatus');
+  const alimtalk = document.getElementById('alimtalk');
+  const alimtalkBody = document.getElementById('alimtalkBody');
+  let selectedId = null;
+
+  const STATUS_LABEL = { new: '신규', review: '검토중', done: '처리완료', hidden: '비공개' };
+  const STATUS_CLASS = { new: 'new', review: 'review', done: 'done', hidden: 'hidden' };
+
+  function renderAdmin() {
+    adminList.replaceChildren();
+    if (reports.length === 0) {
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = 4; td.style.textAlign = 'center'; td.style.padding = '24px'; td.style.color = 'var(--muted)';
+      td.textContent = '접수된 제보가 없습니다. 사용자 탭에서 먼저 제보를 등록해보세요.';
+      tr.appendChild(td); adminList.appendChild(tr);
+      detail.classList.remove('show');
+      return;
+    }
+    reports.forEach((r) => {
+      const tr = document.createElement('tr');
+      tr.addEventListener('click', () => openDetail(r.id));
+      const t1 = document.createElement('td'); t1.textContent = new Date(r.createdAt).toLocaleString('ko-KR');
+      const t2 = document.createElement('td'); t2.textContent = r.title;
+      const t3 = document.createElement('td'); t3.textContent = r.who;
+      const t4 = document.createElement('td');
+      const badge = document.createElement('span'); badge.className = 'badge ' + STATUS_CLASS[r.status]; badge.textContent = STATUS_LABEL[r.status];
+      t4.appendChild(badge);
+      tr.append(t1, t2, t3, t4);
+      adminList.appendChild(tr);
+    });
+  }
+
+  function openDetail(id) {
+    const r = reports.find(x => x.id === id);
+    if (!r) return;
+    selectedId = id;
+    detail.classList.add('show');
+    dTitle.textContent = r.title;
+    dContent.textContent = r.content;
+    dUrl.textContent = r.url || '—';
+    dWho.textContent = r.who;
+    dStatusEl.textContent = STATUS_LABEL[r.status];
+    dImgs.replaceChildren();
+    if (r.images && r.images.length) {
+      r.images.forEach(src => {
+        const img = document.createElement('img');
+        img.src = src; img.style.width = '60px'; img.style.height = '60px'; img.style.objectFit = 'cover'; img.style.marginRight = '4px'; img.style.borderRadius = '2px';
+        dImgs.appendChild(img);
+      });
+    } else {
+      dImgs.textContent = '없음';
+    }
+    alimtalk.style.display = 'none';
+  }
+
+  document.querySelectorAll('.actions button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (selectedId === null) return;
+      const r = reports.find(x => x.id === selectedId);
+      if (!r) return;
+      const action = btn.dataset.action;
+      if (action === 'review') { r.status = 'review'; save(); renderAdmin(); openDetail(r.id); toast('상태: 검토 중'); }
+      else if (action === 'done') {
+        r.status = 'done'; save(); renderAdmin(); openDetail(r.id);
+        alimtalk.style.display = '';
+        alimtalkBody.textContent = `[가짜뉴스 제보 처리 안내]\n안녕하세요. 접수해주신 제보 "${r.title}"가 검토 후 처리 완료되었습니다.\n관련 조치 내역은 사이트 마이페이지에서 확인하실 수 있습니다.\n수신: ${r.phone}`;
+        toast('알림톡 발송 완료 (시뮬레이션)');
+      }
+      else if (action === 'hidden') { r.status = 'hidden'; save(); renderAdmin(); openDetail(r.id); toast('비공개 처리됨'); }
+      else if (action === 'delete') {
+        reports = reports.filter(x => x.id !== selectedId); selectedId = null;
+        save(); renderAdmin(); detail.classList.remove('show'); toast('삭제됨');
+      }
+    });
+  });
+
+  renderAdmin();
+})();
+</script>
+
+</body>
+</html>

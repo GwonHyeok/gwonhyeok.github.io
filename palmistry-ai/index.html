@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 기반 생체 이미지 파이프라인 PoC — 제안서</title>
+<meta name="description" content="손바닥 이미지 키포인트 추출 파이프라인 PoC 제안서. 권혁 (10년차 풀스택, SoulTalk 운영자).">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --ink: #0c0e10; --ink-2: #2b2f33; --muted: #6b7178; --line: #e6e8ec; --bg: #fafaf8; --paper: #ffffff; --accent-bg: #f1f1ed; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: 'Inter', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 15px; line-height: 1.65; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  .page { max-width: 860px; margin: 0 auto; background: var(--paper); padding: 72px 64px 96px; border-left: 1px solid var(--line); border-right: 1px solid var(--line); min-height: 100vh; }
+  header.cover { border-bottom: 1px solid var(--line); padding-bottom: 28px; margin-bottom: 40px; }
+  .eyebrow { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  h1 { font-size: 30px; line-height: 1.25; font-weight: 700; margin: 0 0 14px; letter-spacing: -0.01em; }
+  .meta { display: flex; flex-wrap: wrap; gap: 24px; font-size: 13px; color: var(--muted); }
+  .meta b { color: var(--ink-2); font-weight: 500; }
+  h2 { font-size: 18px; font-weight: 700; margin: 48px 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--line); letter-spacing: -0.005em; }
+  h3 { font-size: 15px; font-weight: 600; margin: 28px 0 10px; }
+  p { margin: 10px 0; }
+  ul { padding-left: 20px; margin: 10px 0; }
+  li { margin: 4px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+  th, td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+  th { font-weight: 600; background: var(--accent-bg); font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-2); }
+  .callout { border: 1px solid var(--line); background: var(--accent-bg); padding: 14px 18px; margin: 18px 0; font-size: 14px; border-radius: 2px; }
+  code, pre { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; }
+  pre { background: var(--accent-bg); padding: 14px 16px; overflow-x: auto; border: 1px solid var(--line); border-radius: 2px; line-height: 1.5; }
+  .price { font-size: 22px; font-weight: 700; }
+  .demo { border: 1px solid var(--line); margin: 18px 0; border-radius: 2px; }
+  .demo-head { padding: 14px 18px; background: var(--accent-bg); border-bottom: 1px solid var(--line); font-size: 13px; color: var(--ink-2); display: flex; justify-content: space-between; align-items: center; }
+  .demo-tag { font-size: 11px; padding: 3px 8px; background: var(--ink); color: white; letter-spacing: 0.06em; text-transform: uppercase; border-radius: 2px; }
+  .demo-body { padding: 18px; }
+  .drop { border: 1px dashed #b8bdc4; background: #fafbfc; padding: 28px 16px; text-align: center; color: var(--muted); font-size: 13px; border-radius: 2px; cursor: pointer; transition: background 0.15s; display: block; }
+  .drop:hover { background: #f1f1ed; }
+  .drop b { color: var(--ink); font-weight: 600; }
+  .drop input { display: none; }
+  .samples { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .samples button { font-size: 12px; padding: 6px 12px; background: white; border: 1px solid var(--line); cursor: pointer; color: var(--ink-2); font-family: inherit; }
+  .samples button:hover { background: var(--accent-bg); }
+  .result-wrap { margin-top: 14px; display: none; }
+  .result-wrap.show { display: block; }
+  .canvas-wrap { background: #0d0c0a; border: 1px solid var(--line); overflow: hidden; text-align: center; }
+  .canvas-wrap canvas { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+  .status { font-size: 12px; color: var(--muted); margin-top: 10px; font-family: 'JetBrains Mono', monospace; }
+  .status.err { color: #b54a2a; }
+  .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 14px; font-size: 13px; }
+  .feat-card { border: 1px solid var(--line); background: #fafbfc; padding: 12px 14px; border-radius: 2px; }
+  .feat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .feat-value { font-size: 16px; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+  .feat-detail { font-size: 12px; color: var(--ink-2); margin-top: 4px; }
+  footer.foot { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; }
+  footer.foot a { color: var(--ink-2); text-decoration: none; border-bottom: 1px solid var(--line); }
+  @media (max-width: 720px) { .page { padding: 40px 22px 60px; border: none; } h1 { font-size: 24px; } .meta { gap: 12px; flex-direction: column; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="cover">
+  <div class="eyebrow">제안서 · Wishket #155420</div>
+  <h1>AI 기반 생체 이미지 파이프라인 PoC 개발</h1>
+  <div class="meta">
+    <span><b>제안자</b> 권혁 (10년차 풀스택)</span>
+    <span><b>제안</b> 19,000,000원</span>
+    <span><b>기간</b> 120일</span>
+    <span><b>도메인</b> 점술/관상 — SoulTalk(국내 1위) 운영자</span>
+  </div>
+</header>
+
+<section>
+  <h2>1. 한 줄 요약</h2>
+  <p>
+    손바닥 이미지에서 <b>키포인트·길이 비율을 실제로 추출하는 PoC를 제안서 작성 단계에서 미리 구현</b>해두었습니다.
+    아래 데모에서 본인의 손 사진을 업로드하시면 <b>21개 키포인트 검출 + 검지/중지 길이 비교</b>가 브라우저에서 즉시 실행됩니다.
+    이미지는 어디에도 전송되지 않고 브라우저 내에서만 처리됩니다.
+  </p>
+</section>
+
+<section>
+  <h2>2. 인터랙티브 데모 — 직접 손 사진을 올려보세요</h2>
+  <div class="demo">
+    <div class="demo-head">
+      <span><b>손바닥 키포인트 추출 PoC</b> · MediaPipe Hands</span>
+      <span class="demo-tag">Live</span>
+    </div>
+    <div class="demo-body">
+      <label class="drop" id="drop">
+        <div><b>여기에 손 사진을 드롭</b>하거나 클릭해 이미지를 선택하세요</div>
+        <div style="margin-top:6px; font-size:12px;">JPG / PNG · 손바닥이 카메라를 향한 사진 권장</div>
+        <input type="file" id="file" accept="image/*">
+      </label>
+
+      <div class="status" id="status">대기 중. 모델은 첫 추론 시 자동 로드됩니다 (약 5MB).</div>
+
+      <div class="result-wrap" id="result">
+        <div class="canvas-wrap">
+          <canvas id="canvas" width="640" height="480"></canvas>
+        </div>
+        <div class="features" id="features"></div>
+        <div class="callout" id="interp"></div>
+      </div>
+    </div>
+  </div>
+
+  <p style="font-size:13px; color:var(--muted);">
+    위 데모는 본 PoC의 첫 단계인 <b>손 영역 인식 + 21개 키포인트 추출</b>까지를 그대로 보여드립니다.
+    실제 PoC에는 여기에 <b>손금 선 검출(엣지)</b>·<b>점/마커 검출(블롭)</b>·<b>공식 대입 엔진</b>이 추가됩니다.
+  </p>
+</section>
+
+<section>
+  <h2>3. 도메인 적합도</h2>
+  <p>
+    국내 1위 타로·사주·신점 앱 <b>SoulTalk</b>을 제가 Flutter + 백엔드 전 과정 단독으로 구축·운영했습니다.
+    사주·타로·관상 등 점술 결과 도출 로직, 사용자 입력에서 텍스트 결과로 풀어내는 흐름,
+    대규모 트래픽 안정화까지 본 프로젝트의 결과 산출 파트와 직접 연결됩니다.
+  </p>
+  <p>
+    본 PoC는 <b>헬스케어가 아닌 관상/손금의 IT 구현</b>이라는 점에서 일반 ML 엔지니어보다
+    도메인 운영 경험자가 텍스트 풀이 톤·결과 표현 방식 합의를 빠르게 끌어낼 수 있다고 판단합니다.
+  </p>
+</section>
+
+<section>
+  <h2>4. 기술 스택 제안</h2>
+  <table>
+    <thead><tr><th>레이어</th><th>스택</th><th>역할</th></tr></thead>
+    <tbody>
+      <tr><td>키포인트 검출</td><td>MediaPipe Hands / OpenCV</td><td>21개 landmark 추출, 손가락 영역 분리</td></tr>
+      <tr><td>특징 추출</td><td>NumPy + OpenCV</td><td>길이 비율, 손금 선(엣지 디텍션), 점(블롭 디텍션)</td></tr>
+      <tr><td>공식 엔진</td><td>Python 규칙 엔진</td><td>고객사 제공 공식을 JSON DSL로 정규화</td></tr>
+      <tr><td>배치 파이프라인</td><td>Celery / Argo / 또는 단순 큐</td><td>14만 장 분산 처리 + 재시도 + 정합성 검증</td></tr>
+      <tr><td>관리자 웹</td><td>Next.js + FastAPI</td><td>이미지 업로드 → 추출 시각화 → 결과 텍스트 확인</td></tr>
+      <tr><td>인프라</td><td>AWS / GCP</td><td>GPU는 학습 단계만 사용. 추론은 CPU + 서버리스 비용 최적화</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>5. 14만 장 처리 아키텍처</h2>
+  <pre>┌──────────────┐    ┌────────────────────┐    ┌──────────────┐    ┌──────────────┐
+│ 원본 이미지   │ →  │ 전처리 + Hands 검출  │ →  │ 특징 JSON     │ →  │ 공식 엔진     │
+│ 14만 장 (S3)  │    │ 손 영역, 21 keypoint │    │ 비율/선/점    │    │ 결과 텍스트   │
+└──────────────┘    └────────────────────┘    └──────────────┘    └──────────────┘
+                                 ↓
+                      [실패 케이스 격리 + 재시도 큐]
+                                 ↓
+                        정합성 검증 → 관리자 시각화</pre>
+  <ul>
+    <li>실패 케이스(손 미검출, 흐림 등)는 별도 큐로 분리해 모델 보강 데이터로 활용</li>
+    <li>각 단계 결과는 중간 저장 (장애 시 해당 단계부터 재실행)</li>
+    <li>관리자 웹에서 무작위 샘플링하여 특징 추출 정합성 직접 확인 가능</li>
+  </ul>
+</section>
+
+<section>
+  <h2>6. 일정 (120일)</h2>
+  <table>
+    <thead><tr><th>주차</th><th>마일스톤</th></tr></thead>
+    <tbody>
+      <tr><td>1~3주차</td><td>데이터 샘플 검토 · 전처리·키포인트 추출 PoC 검증 · 공식 인터뷰</td></tr>
+      <tr><td>4~10주차</td><td>특징 추출 모듈 (선 검출, 점 검출) · 공식 엔진 구현 · 배치 파이프라인</td></tr>
+      <tr><td>11~14주차</td><td>관리자 웹 · 결과 시각화 · 정합성 검증 보고서</td></tr>
+      <tr><td>15~17주차</td><td>14만 장 풀배치 실행 · 안정화 · 운영 매뉴얼 · 인수인계</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>7. 견적 · 유지보수</h2>
+  <table>
+    <tbody>
+      <tr><td>제안 금액</td><td class="price">19,000,000원</td></tr>
+      <tr><td>제안 기간</td><td>120일</td></tr>
+      <tr><td>하자보수</td><td>PoC 종료 후 3개월 무상</td></tr>
+      <tr><td>산출물</td><td>요구사항 정의서 · 파이프라인 아키텍처 문서 · 소스 코드 원본 · 운영 매뉴얼</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<footer class="foot">
+  <span>권혁 · 10년차 풀스택 + AI 서비스 개발자 (SoulTalk · OpenHealth · ContentFlow 외)</span>
+  <a href="https://resume.ghyeok.io/">resume.ghyeok.io</a>
+</footer>
+
+</div>
+
+<script type="module">
+const statusEl = document.getElementById('status');
+const result = document.getElementById('result');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const featuresEl = document.getElementById('features');
+const interp = document.getElementById('interp');
+const fileInput = document.getElementById('file');
+const drop = document.getElementById('drop');
+
+let hands = null;
+let loading = false;
+
+function setStatus(msg, err = false) {
+  statusEl.textContent = msg;
+  statusEl.classList.toggle('err', err);
+}
+
+async function loadHands() {
+  if (hands) return hands;
+  if (loading) { while (loading) await new Promise(r => setTimeout(r, 100)); return hands; }
+  loading = true;
+  setStatus('MediaPipe Hands 모델 로드 중... (약 5MB)');
+  await new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/hands.js';
+    s.onload = resolve; s.onerror = reject;
+    document.head.appendChild(s);
+  });
+  hands = new window.Hands({ locateFile: (f) => 'https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/' + f });
+  hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5, staticImageMode: true });
+  hands.onResults(onResults);
+  loading = false;
+  setStatus('모델 로드 완료. 이미지를 올려주세요.');
+  return hands;
+}
+
+let currentImg = null;
+
+async function processImage(img) {
+  currentImg = img;
+  await loadHands();
+  setStatus('추론 중...');
+  const maxW = 720;
+  let w = img.naturalWidth, h = img.naturalHeight;
+  if (w > maxW) { h = h * (maxW / w); w = maxW; }
+  canvas.width = w; canvas.height = h;
+  ctx.drawImage(img, 0, 0, w, h);
+  await hands.send({ image: img });
+}
+
+function dist(a, b) { return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2); }
+
+const CONNECTIONS = [[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[5,9],[9,10],[10,11],[11,12],[9,13],[13,14],[14,15],[15,16],[13,17],[17,18],[18,19],[19,20],[0,17]];
+
+function buildFeatCard(label, value, detail) {
+  const card = document.createElement('div'); card.className = 'feat-card';
+  const l = document.createElement('div'); l.className = 'feat-label'; l.textContent = label;
+  const v = document.createElement('div'); v.className = 'feat-value'; v.textContent = value;
+  const d = document.createElement('div'); d.className = 'feat-detail'; d.textContent = detail;
+  card.append(l, v, d);
+  return card;
+}
+
+function onResults(res) {
+  if (!res.multiHandLandmarks || res.multiHandLandmarks.length === 0) {
+    setStatus('손이 검출되지 않았습니다. 손바닥이 정면을 향한 사진을 사용해주세요.', true);
+    result.classList.remove('show');
+    return;
+  }
+  result.classList.add('show');
+  const lm = res.multiHandLandmarks[0];
+  const w = canvas.width, h = canvas.height;
+  ctx.drawImage(currentImg, 0, 0, w, h);
+
+  ctx.strokeStyle = 'rgba(212, 160, 23, 0.9)';
+  ctx.lineWidth = 2.5;
+  for (const [a, b] of CONNECTIONS) {
+    ctx.beginPath();
+    ctx.moveTo(lm[a].x * w, lm[a].y * h);
+    ctx.lineTo(lm[b].x * w, lm[b].y * h);
+    ctx.stroke();
+  }
+  for (let i = 0; i < lm.length; i++) {
+    ctx.beginPath();
+    ctx.arc(lm[i].x * w, lm[i].y * h, 4, 0, Math.PI * 2);
+    ctx.fillStyle = (i === 8 || i === 12) ? '#ff5252' : '#fff';
+    ctx.fill();
+    ctx.strokeStyle = '#0c0e10'; ctx.lineWidth = 1.5; ctx.stroke();
+  }
+  ctx.strokeStyle = '#ff5252'; ctx.lineWidth = 3.5;
+  ctx.beginPath(); ctx.moveTo(lm[5].x * w, lm[5].y * h); ctx.lineTo(lm[8].x * w, lm[8].y * h); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(lm[9].x * w, lm[9].y * h); ctx.lineTo(lm[12].x * w, lm[12].y * h); ctx.stroke();
+
+  const indexLen = dist(lm[5], lm[8]);
+  const middleLen = dist(lm[9], lm[12]);
+  const ratio = indexLen / middleLen;
+  const palmW = dist(lm[5], lm[17]);
+  const palmH = dist(lm[0], lm[9]);
+
+  featuresEl.replaceChildren(
+    buildFeatCard('검지 길이', (indexLen*100).toFixed(2), '정규화 단위'),
+    buildFeatCard('중지 길이', (middleLen*100).toFixed(2), '정규화 단위'),
+    buildFeatCard('검지 / 중지 비율', ratio.toFixed(3), '1.00 이상 = 검지가 더 김'),
+    buildFeatCard('손바닥 비율 (W/H)', (palmW/palmH).toFixed(3), '5↔17 / 0↔9 keypoint')
+  );
+
+  const dominant = ratio > 1.0 ? '검지' : '중지';
+  interp.textContent = `${dominant}가 더 깁니다 (비율 ${ratio.toFixed(3)}). 공식 대입 단계에서 '${dominant} 우세' 분기로 진입합니다. 실제 PoC에서는 여기에 손금 선 검출 결과와 점 위치를 추가로 합성해 최종 결과 텍스트를 산출합니다.`;
+  setStatus(`검출 완료. landmark 21개 추출, 검지/중지 비율 ${ratio.toFixed(3)}`);
+}
+
+drop.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', (e) => {
+  const f = e.target.files && e.target.files[0]; if (!f) return;
+  const img = new Image();
+  img.onload = () => processImage(img);
+  img.onerror = () => setStatus('이미지 로드 실패', true);
+  img.src = URL.createObjectURL(f);
+});
+drop.addEventListener('dragover', (e) => { e.preventDefault(); drop.style.background = '#f1f1ed'; });
+drop.addEventListener('dragleave', () => { drop.style.background = ''; });
+drop.addEventListener('drop', (e) => {
+  e.preventDefault(); drop.style.background = '';
+  const f = e.dataTransfer.files && e.dataTransfer.files[0]; if (!f) return;
+  const img = new Image();
+  img.onload = () => processImage(img);
+  img.src = URL.createObjectURL(f);
+});
+</script>
+
+</body>
+</html>
