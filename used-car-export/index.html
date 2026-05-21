@@ -1,0 +1,584 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>K-Car 차량 데이터 연동 기술 분석 — 위시켓 #155535</title>
+<meta name="description" content="해외 바이어 중고차 수출 플랫폼 MVP의 K-Car 차량 데이터 연동 가능성 분석. 권혁 (10년차 풀스택).">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --ink: #0c0e10; --ink-2: #2b2f33; --muted: #6b7178; --line: #e6e8ec; --bg: #fafaf8; --paper: #ffffff; --accent-bg: #f1f1ed; --brand: #2563eb; --ok: #16a34a; --warn: #d97706; --danger: #dc2626; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: 'Inter', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 15px; line-height: 1.65; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  .page { max-width: 860px; margin: 0 auto; background: var(--paper); padding: 72px 64px 96px; border-left: 1px solid var(--line); border-right: 1px solid var(--line); min-height: 100vh; }
+  header.cover { border-bottom: 1px solid var(--line); padding-bottom: 28px; margin-bottom: 40px; }
+  .eyebrow { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  h1 { font-size: 30px; line-height: 1.25; font-weight: 700; margin: 0 0 14px; letter-spacing: -0.01em; }
+  .lede { color: var(--ink-2); font-size: 16px; margin: 0 0 18px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 24px; font-size: 13px; color: var(--muted); }
+  .meta b { color: var(--ink-2); font-weight: 500; }
+  h2 { font-size: 18px; font-weight: 700; margin: 48px 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--line); letter-spacing: -0.005em; }
+  h3 { font-size: 15px; font-weight: 600; margin: 28px 0 10px; }
+  p { margin: 10px 0; }
+  ul { padding-left: 20px; margin: 10px 0; }
+  li { margin: 4px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+  th, td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+  th { font-weight: 600; background: var(--accent-bg); font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-2); }
+  .callout { border: 1px solid var(--line); background: var(--accent-bg); padding: 14px 18px; margin: 18px 0; font-size: 14px; border-radius: 2px; }
+  .callout.warn { border-left: 3px solid var(--warn); background: #fef9ec; }
+  .callout.danger { border-left: 3px solid var(--danger); background: #fef2f2; }
+  .callout.ok { border-left: 3px solid var(--ok); background: #f0fdf4; }
+  .callout b { color: var(--ink); }
+
+  code { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; background: var(--accent-bg); padding: 1px 5px; border-radius: 2px; }
+  pre { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; background: #0c0e10; color: #d4d4d4; padding: 16px 18px; border-radius: 2px; overflow-x: auto; line-height: 1.55; margin: 12px 0; }
+  pre .k { color: #c586c0; }     /* keyword */
+  pre .s { color: #ce9178; }     /* string */
+  pre .n { color: #b5cea8; }     /* number */
+  pre .c { color: #6a9955; font-style: italic; }
+  pre .p { color: #569cd6; }     /* prop key */
+  pre .h { color: #4ec9b0; }     /* host/path */
+
+  .endpoint { border: 1px solid var(--line); border-radius: 2px; margin: 14px 0; overflow: hidden; }
+  .endpoint-head { padding: 10px 14px; background: var(--accent-bg); display: flex; align-items: center; gap: 10px; font-size: 13px; }
+  .method { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 2px; color: white; letter-spacing: 0.04em; }
+  .method.get { background: #16a34a; }
+  .method.post { background: #2563eb; }
+  .endpoint-path { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: var(--ink); flex: 1; word-break: break-all; }
+  .endpoint-tag { font-size: 11px; padding: 2px 8px; background: white; border: 1px solid var(--line); border-radius: 10px; color: var(--muted); }
+  .endpoint-tag.enc { color: var(--warn); border-color: var(--warn); }
+  .endpoint-tag.plain { color: var(--ok); border-color: var(--ok); }
+  .endpoint-body { padding: 14px 16px; font-size: 13.5px; }
+
+  .price { font-size: 22px; font-weight: 700; }
+  .badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 500; background: var(--accent-bg); color: var(--ink-2); }
+  .badge.ok { background: #dcfce7; color: #166534; }
+  .badge.warn { background: #fef3c7; color: #92400e; }
+  .badge.danger { background: #fee2e2; color: #991b1b; }
+  hr { border: 0; border-top: 1px solid var(--line); margin: 32px 0; }
+  footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+  footer a { color: var(--ink-2); }
+
+  @media (max-width: 720px) {
+    .page { padding: 40px 22px 64px; }
+    h1 { font-size: 24px; }
+    pre { font-size: 11.5px; padding: 12px; }
+    .endpoint-head { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<main class="page">
+
+<header class="cover">
+  <div class="eyebrow">기술 검증 보고서 · 위시켓 #155535</div>
+  <h1>K-Car 차량 데이터 연동 기술 분석</h1>
+  <p class="lede">해외 바이어 대상 중고차 수출 플랫폼 MVP 구축 — K-Car 외부 데이터 연동의 기술적 가능성, 응답 데이터 품질, 운영·법적 리스크를 실측으로 검증한 보고서입니다.</p>
+  <div class="meta">
+    <span><b>제안자</b> 권혁 (10년차 풀스택)</span>
+    <span><b>분석일</b> 2026-05-21</span>
+    <span><b>대상</b> kcar.com 공개 웹 트래픽</span>
+    <span><b>방법</b> 정상 브라우징 + 클라이언트 JS 정적 분석</span>
+  </div>
+</header>
+
+<div class="callout warn">
+  <b>이 문서의 위치:</b> 입찰 단계에서 클라이언트가 K-Car 데이터 연동의 실제 가능성을 판단할 수 있도록 작성된 <b>기술 실측 보고서</b>입니다. 본 보고서는 <b>운영 단계에서 비공식 채널 직접 호출을 권장하지 않으며</b>, 최종 권고안은 <a href="#권고">§9. 운영 권고</a>에서 확인하실 수 있습니다.
+</div>
+
+<h2>1. 한줄 요약</h2>
+
+<p><b>기술적으로는 100% 가능합니다.</b> K-Car 사이트는 자사 프론트엔드(www.kcar.com)에서 단일 백엔드(api.kcar.com)로 호출하는 8개의 핵심 API로 구성돼 있고, 차량 검색만 가벼운 난독화(AES-128, 키·IV 클라이언트 하드코딩)가 적용되어 있으며, 응답은 모두 평문 JSON입니다. 차량당 VIN·사고이력·부품별 진단·360° 이미지 72장까지 전부 받을 수 있습니다.</p>
+
+<p><b>다만 운영 단계에서는 권장하지 않습니다.</b> 약관·DB권·개인정보·키 로테이션 리스크가 비즈니스 지속성을 위협합니다. 견적은 <b>(A) 공식 제휴 연동</b> 또는 <b>(B) 관리자 수동 등록</b> 두 트랙으로 분리해 제안합니다.</p>
+
+<h2>2. 검증 방법</h2>
+
+<ol>
+  <li><b>정상 브라우징으로 트래픽 캡처</b> — Chrome DevTools로 실제 사용자처럼 검색 → 차량 상세 진입했을 때 사이트가 자체적으로 호출하는 모든 API 응답을 기록</li>
+  <li><b>Nuxt 빌드 청크 정적 분석</b> — <code>/_nuxt/*.js</code> 9개 청크를 다운로드해 <code>enc/AES/drct</code> 키워드로 grep, 검색 API 페이로드 암호화 로직 식별</li>
+  <li><b>응답 본문 보존</b> — 8개 endpoint의 실응답 JSON을 파일로 저장해 스키마 검증</li>
+</ol>
+
+<h2>3. 아키텍처 한눈에</h2>
+
+<pre><span class="c">// K-Car 시스템 구조 (분석 결과)</span>
+www.kcar.com (Nuxt SPA)
+  ├── /_nuxt/<span class="s">{hash}</span>.js          <span class="c">// 클라이언트 번들 (CryptoJS 포함)</span>
+  └── XHR/fetch ──►  api.kcar.com (REST)
+                        ├── /bc/search/*       <span class="c">// 검색 (POST, enc 암호화)</span>
+                        ├── /bc/car-info-*     <span class="c">// 상세 (GET, 평문)</span>
+                        ├── /bc/detail/gov/*   <span class="c">// 정부 등록 (GET, VIN 포함)</span>
+                        ├── /bc/dgnos/3dview   <span class="c">// 부품 진단</span>
+                        ├── /bc/mma/info       <span class="c">// 종합 (POST, 평문)</span>
+                        ├── /bc/sub-code       <span class="c">// 메타 (제조사/연료/색상...)</span>
+                        └── /bc/search/model-ranking
+                       img.kcar.com (이미지 CDN, 인증 없음)
+                        └── 3dcarpicture/<span class="s">YYYY/MM/centerCd/carCdSuffix_1/</span>
+                              ├── main/main780.jpg
+                              ├── open/open_{000..350}_lq.jpg   <span class="c">// 360° × 36장</span>
+                              └── close/close_{000..350}_lq.jpg <span class="c">// 360° × 36장</span></pre>
+
+<h2>4. Endpoint 8종 매핑</h2>
+
+<h3>4-1. 차량 검색 <span class="badge warn">enc 암호화</span></h3>
+
+<div class="endpoint">
+  <div class="endpoint-head">
+    <span class="method post">POST</span>
+    <span class="endpoint-path">https://api.kcar.com/bc/search/list/drct</span>
+    <span class="endpoint-tag enc">enc</span>
+  </div>
+  <div class="endpoint-body">
+    차량 검색 결과 리스트. 페이지당 26건, 전체 8,844건 (검증 시점).
+    <br>응답: <code>data.totalCnt</code>, <code>data.totalPageCnt</code>, <code>data.rows[]</code> (차량 메타 60+ 필드)
+  </div>
+</div>
+
+<div class="endpoint">
+  <div class="endpoint-head">
+    <span class="method post">POST</span>
+    <span class="endpoint-path">https://api.kcar.com/bc/search/list/acm</span>
+    <span class="endpoint-tag enc">enc</span>
+  </div>
+  <div class="endpoint-body">검색 누적 통계 (스크롤형 무한 로드용).</div>
+</div>
+
+<div class="endpoint">
+  <div class="endpoint-head">
+    <span class="method post">POST</span>
+    <span class="endpoint-path">https://api.kcar.com/bc/search/group/mnuftr</span>
+    <span class="endpoint-tag enc">enc</span>
+  </div>
+  <div class="endpoint-body">제조사별 그룹 집계.</div>
+</div>
+
+<h3>4-2. 차량 상세 <span class="badge ok">평문</span></h3>
+
+<div class="endpoint">
+  <div class="endpoint-head">
+    <span class="method get">GET</span>
+    <span class="endpoint-path">/bc/car-info-detail-of-ng?i_sCarCd={carCd}&amp;i_sPassYn=N&amp;bltbdKnd=CM050</span>
+    <span class="endpoint-tag plain">평문</span>
+  </div>
+  <div class="endpoint-body">차량 사진 리스트(외관/내부/등록증), 할부 조건 기본값, 차량 메타 200+ 필드.</div>
+</div>
+
+<div class="endpoint">
+  <div class="endpoint-head">
+    <span class="method get">GET</span>
+    <span class="endpoint-path">/bc/detail/gov/bas?carCd={carCd}</span>
+    <span class="endpoint-tag plain">평문</span>
+  </div>
+  <div class="endpoint-body"><b>VIN(차대번호)</b>, 차량 중량·길이·너비·높이·축거, 공인 연비, 최고출력, 생산국가·생산지·제조일.</div>
+</div>
+
+<div class="endpoint">
+  <div class="endpoint-head">
+    <span class="method get">GET</span>
+    <span class="endpoint-path">/bc/dgnos/3dview?i_sCarCd={carCd}</span>
+    <span class="endpoint-tag plain">평문</span>
+  </div>
+  <div class="endpoint-body">외관 10개 + 프레임 26개 부품의 상태 코드 (1=정상, 2=수리/판금 흔적).</div>
+</div>
+
+<div class="endpoint">
+  <div class="endpoint-head">
+    <span class="method post">POST</span>
+    <span class="endpoint-path">/bc/mma/info</span>
+    <span class="endpoint-tag plain">평문</span>
+  </div>
+  <div class="endpoint-body">차량 종합 정보 (조회수·좋아요·사고이력·센터·판매자 메모).
+    <br>Request body: <code>{"i_sCarCd":"EC61357476","a_ThemeNm":"none","a_leaseFlag":"Y"}</code></div>
+</div>
+
+<div class="endpoint">
+  <div class="endpoint-head">
+    <span class="method get">GET</span>
+    <span class="endpoint-path">/bc/expct-dlvr-date?i_sCarCd={carCd}&amp;i_sOnlnSellAplyYn=N</span>
+    <span class="endpoint-tag plain">평문</span>
+  </div>
+  <div class="endpoint-body">예상 배송일.</div>
+</div>
+
+<h3>4-3. 메타 코드 <span class="badge ok">평문</span></h3>
+
+<table>
+<thead><tr><th>Path</th><th>용도</th></tr></thead>
+<tbody>
+<tr><td><code>GET /bc/sub-code?sMstCode=CAR_CATEGORY</code></td><td>차종 분류</td></tr>
+<tr><td><code>GET /bc/sub-code?sMstCode=CAR_FUEL</code></td><td>연료 분류</td></tr>
+<tr><td><code>GET /bc/sub-code?sMstCode=CAR_COLOR</code></td><td>색상</td></tr>
+<tr><td><code>GET /bc/sub-code?sMstCode=CAR_OPTION2</code></td><td>옵션 (47종)</td></tr>
+<tr><td><code>GET /bc/sub-code?sMstCode=HOT_MARKCD</code></td><td>핫마크 태그</td></tr>
+<tr><td><code>GET /bc/search/model-ranking?type=0</code></td><td>인기 모델 TOP 10</td></tr>
+<tr><td><code>GET /bc/rcmdtn-keyword</code></td><td>추천 키워드</td></tr>
+</tbody></table>
+
+<h2>5. 검색 API 암호화 사양</h2>
+
+<p>검색 리스트 API <b>3개만</b> 페이로드를 <code>enc</code> 필드 하나로 암호화 전송합니다. 나머지는 모두 평문. 키와 IV가 클라이언트 JS에 평문으로 하드코딩되어 있어 사실상 <b>난독화 수준</b>입니다 (목적은 자동 봇 1차 방어로 추정).</p>
+
+<h3>5-1. 클라이언트 코드 (난독화 해제)</h3>
+
+<pre><span class="c">// /_nuxt/e55fb8a.js 내부 (chunk size 2.1MB)</span>
+setEncDef: <span class="k">function</span>(data) {
+  <span class="k">return this</span>.setEnc(data, <span class="s">"SKFJ2424DasfaJRI"</span>, <span class="s">"sfq241sf3dscs321"</span>)
+},
+setEnc: <span class="k">function</span>(data, e, t) {
+  <span class="k">return</span> CryptoJS.AES.encrypt(
+    data,
+    CryptoJS.enc.Utf8.parse(e),                  <span class="c">// KEY</span>
+    {
+      iv: CryptoJS.enc.Utf8.parse(t),            <span class="c">// IV</span>
+      padding: CryptoJS.pad.Pkcs7,
+      mode: CryptoJS.mode.CBC
+    }
+  ).toString()
+},
+setEncParam: <span class="k">function</span>(param) {
+  <span class="k">return</span> { enc: <span class="k">this</span>.setEncDef(JSON.stringify(param)) }
+},
+searchDrctList: <span class="k">function</span>(param) {
+  <span class="k">return this</span>.$AxiosBuilder
+    .data(<span class="k">this</span>.setEncParam(param))
+    .build()
+    .post(<span class="s">"/bc/search/list/drct"</span>)
+}</pre>
+
+<h3>5-2. 암호화 사양</h3>
+
+<table>
+<thead><tr><th>항목</th><th>값</th></tr></thead>
+<tbody>
+<tr><td>알고리즘</td><td><b>AES-128-CBC + PKCS7</b></td></tr>
+<tr><td>Key (UTF-8, 16바이트)</td><td><code>SKFJ2424DasfaJRI</code></td></tr>
+<tr><td>IV (UTF-8, 16바이트, 고정)</td><td><code>sfq241sf3dscs321</code></td></tr>
+<tr><td>입력</td><td><code>JSON.stringify(searchParam)</code></td></tr>
+<tr><td>출력 인코딩</td><td>Base64 (CryptoJS 기본)</td></tr>
+<tr><td>전송 형식</td><td><code>{ "enc": "&lt;base64&gt;" }</code></td></tr>
+<tr><td>응답 복호화 필요</td><td>❌ 없음 (평문 JSON)</td></tr>
+</tbody></table>
+
+<h3>5-3. Node.js 재현 (참고용)</h3>
+
+<pre><span class="k">const</span> crypto = <span class="k">require</span>(<span class="s">'crypto'</span>);
+<span class="k">const</span> KEY = Buffer.from(<span class="s">'SKFJ2424DasfaJRI'</span>, <span class="s">'utf8'</span>);
+<span class="k">const</span> IV  = Buffer.from(<span class="s">'sfq241sf3dscs321'</span>, <span class="s">'utf8'</span>);
+
+<span class="k">function</span> encKcarParam(param) {
+  <span class="k">const</span> c = crypto.createCipheriv(<span class="s">'aes-128-cbc'</span>, KEY, IV);
+  <span class="k">return</span> c.update(JSON.stringify(param), <span class="s">'utf8'</span>, <span class="s">'base64'</span>)
+       + c.final(<span class="s">'base64'</span>);
+}
+
+<span class="c">// 호출 예 (Node 서버사이드, CORS 무관)</span>
+<span class="k">const</span> enc = encKcarParam({ pageNo: <span class="n">1</span>, limit: <span class="n">26</span>, mnuftrCd: <span class="s">'001'</span> });
+<span class="k">const</span> res = <span class="k">await</span> fetch(<span class="s">'https://api.kcar.com/bc/search/list/drct'</span>, {
+  method: <span class="s">'POST'</span>,
+  headers: {
+    <span class="s">'Content-Type'</span>: <span class="s">'application/json'</span>,
+    <span class="s">'Origin'</span>:       <span class="s">'https://www.kcar.com'</span>,
+    <span class="s">'Referer'</span>:      <span class="s">'https://www.kcar.com/'</span>,
+  },
+  body: JSON.stringify({ enc })
+});</pre>
+
+<div class="callout warn">
+  <b>왜 "암호화가 아니라 난독화"인가:</b> 키·IV가 클라이언트 JS에 평문으로 박혀 있고, IV가 고정이라 CBC의 의미도 상실됩니다. 진짜 보안이 아니라 봇 트래픽 1차 방어용 obfuscation입니다. K-Car 측이 키 로테이션을 자주 하지 않는 이유도 같은 맥락 — 키가 보호 대상이 아닌 셈입니다.
+</div>
+
+<h2>6. 실제 Request / Response 샘플</h2>
+
+<h3>6-1. 차량 검색 — POST <code>/bc/search/list/drct</code></h3>
+
+<p><b>Request (실측):</b></p>
+<pre>POST /bc/search/list/drct HTTP/2
+Host: api.kcar.com
+Content-Type: application/json
+Origin: https://www.kcar.com
+Referer: https://www.kcar.com/
+Accept: application/json, text/plain, */*
+
+{ <span class="p">"enc"</span>: <span class="s">"gEa/4VFh8fIVdgV57tSPerlTpuTd/En+dr9UDDEN8UoZOcnrKctaL37x9EBBnlEs..."</span> }</pre>
+
+<p><b>Response (실측, 발췌):</b></p>
+<pre>HTTP/2 <span class="n">200</span>
+content-type: application/json
+access-control-allow-origin: https://www.kcar.com
+
+{
+  <span class="p">"message"</span>: <span class="k">null</span>,
+  <span class="p">"data"</span>: {
+    <span class="p">"totalCnt"</span>: <span class="n">8844</span>,
+    <span class="p">"pageNo"</span>: <span class="n">1</span>,
+    <span class="p">"limit"</span>: <span class="n">26</span>,
+    <span class="p">"totalPageCnt"</span>: <span class="n">341</span>,
+    <span class="p">"rows"</span>: [
+      {
+        <span class="p">"carCd"</span>: <span class="s">"EC61357476"</span>,
+        <span class="p">"mnuftrNm"</span>: <span class="s">"제네시스"</span>,
+        <span class="p">"modelNm"</span>: <span class="s">"GV80 (F/L)"</span>,
+        <span class="p">"grdNm"</span>: <span class="s">"가솔린 2.5 4WD"</span>,
+        <span class="p">"grdDtlNm"</span>: <span class="s">"기본형"</span>,
+        <span class="p">"carWhlNm"</span>: <span class="s">"제네시스 GV80 (F/L) 가솔린 2.5 4WD 기본형"</span>,
+        <span class="p">"prc"</span>: <span class="s">"6430"</span>,                  <span class="c">// 만원 → 6,430만원</span>
+        <span class="p">"instAmt"</span>: <span class="s">"105"</span>,               <span class="c">// 월 할부금 (만원)</span>
+        <span class="p">"milg"</span>: <span class="s">"21849"</span>,                <span class="c">// 주행거리</span>
+        <span class="p">"prdcnYr"</span>: <span class="s">"2024"</span>,
+        <span class="p">"mfgDt"</span>: <span class="s">"202402"</span>,
+        <span class="p">"fuelNm"</span>: <span class="s">"가솔린"</span>,
+        <span class="p">"carctgrNm"</span>: <span class="s">"SUV"</span>,
+        <span class="p">"extrColorNm"</span>: <span class="s">"흰색"</span>,
+        <span class="p">"cno"</span>: <span class="s">"214머4062"</span>,             <span class="c">// 차량번호</span>
+        <span class="p">"acdtHistCnts"</span>: <span class="s">"단순수리"</span>,
+        <span class="p">"hotmarkNm"</span>: <span class="s">"1인소유;제조사AS;정비완료"</span>,
+        <span class="p">"simcDesc"</span>: <span class="s">"#1인소유 #7인승 #파퓰러 패키지 #1열,2열 전동,통풍시트"</span>,
+        <span class="p">"cntrRgnNm"</span>: <span class="s">"홈서비스 메가센터"</span>,
+        <span class="p">"selerNm"</span>: <span class="s">"안재훈"</span>,
+        <span class="p">"selerSafeMbpno"</span>: <span class="s">"0504-1366-1564"</span>,
+        <span class="p">"msizeImgPath"</span>: <span class="s">"https://img.kcar.com/3dcarpicture/2026/04/173/61357476_1/main/main780.jpg"</span>,
+        <span class="p">"view3dFg"</span>: <span class="s">"3D"</span>,
+        <span class="p">"optnNm"</span>: <span class="s">"ABS|내비게이션|선루프|가죽시트|알루미늄 휠|..."</span>,  <span class="c">// 47개</span>
+        <span class="p">"optnCd"</span>: <span class="s">"001|005|010|014|017|020|021|..."</span>
+      },
+      ... <span class="n">25</span> more
+    ]
+  }
+}</pre>
+
+<h3>6-2. 정부 등록 정보 — GET <code>/bc/detail/gov/bas?carCd={carCd}</code></h3>
+
+<pre>GET /bc/detail/gov/bas?carCd=EC61357476 HTTP/2
+Host: api.kcar.com
+<span class="c">// (인증 헤더·쿠키 불필요)</span>
+
+──── Response ────
+{
+  <span class="p">"data"</span>: {
+    <span class="p">"basInfo"</span>: {
+      <span class="p">"cno"</span>: <span class="s">"214머4062"</span>,
+      <span class="p">"vin"</span>: <span class="s">"KMTHA81BDRU206339"</span>,         <span class="c">// 차대번호</span>
+      <span class="p">"carWeit"</span>: <span class="s">"2215"</span>,                  <span class="c">// 차량중량 kg</span>
+      <span class="p">"carLen"</span>: <span class="s">"4940"</span>,
+      <span class="p">"carWidth"</span>: <span class="s">"1975"</span>,
+      <span class="p">"carHeit"</span>: <span class="s">"1715"</span>,
+      <span class="p">"axisSectDst"</span>: <span class="s">"2955"</span>,              <span class="c">// 축거</span>
+      <span class="p">"fuelCnsptnRt"</span>: <span class="s">"8.3"</span>,              <span class="c">// 공인 연비</span>
+      <span class="p">"motoHghstOutpVal"</span>: <span class="s">"304"</span>            <span class="c">// 최고출력 PS</span>
+    },
+    <span class="p">"productInfo"</span>: {
+      <span class="p">"prdcnNatn"</span>: <span class="s">"대한민국"</span>,
+      <span class="p">"prdpl"</span>: <span class="s">"울산"</span>,
+      <span class="p">"prdcnDd"</span>: <span class="s">"20240215"</span>
+    }
+  },
+  <span class="p">"success"</span>: <span class="k">true</span>
+}</pre>
+
+<h3>6-3. 3D 진단 — GET <code>/bc/dgnos/3dview?i_sCarCd={carCd}</code></h3>
+
+<pre>{
+  <span class="p">"data"</span>: {
+    <span class="p">"carType"</span>: <span class="s">"suv"</span>,
+    <span class="p">"exteriorData"</span>: [
+      { <span class="p">"part"</span>: <span class="s">"bonnet"</span>,            <span class="p">"status"</span>: <span class="s">"2"</span> },  <span class="c">// 판금/교환</span>
+      { <span class="p">"part"</span>: <span class="s">"roof"</span>,              <span class="p">"status"</span>: <span class="s">"1"</span> },
+      { <span class="p">"part"</span>: <span class="s">"trunk"</span>,             <span class="p">"status"</span>: <span class="s">"1"</span> },
+      { <span class="p">"part"</span>: <span class="s">"front-fender-left"</span>, <span class="p">"status"</span>: <span class="s">"1"</span> },
+      ...
+    ],
+    <span class="p">"frameData"</span>: [
+      { <span class="p">"part"</span>: <span class="s">"front-panel"</span>, <span class="p">"status"</span>: <span class="s">"1"</span> },
+      { <span class="p">"part"</span>: <span class="s">"radiator"</span>,    <span class="p">"status"</span>: <span class="s">"2"</span> },          <span class="c">// 교환</span>
+      { <span class="p">"part"</span>: <span class="s">"a-pillar-left"</span>, <span class="p">"status"</span>: <span class="s">"1"</span> },
+      ...
+    ]
+  }
+}</pre>
+
+<h3>6-4. 차량 종합 — POST <code>/bc/mma/info</code></h3>
+
+<pre>POST /bc/mma/info HTTP/2
+Content-Type: application/json
+
+{ <span class="p">"i_sCarCd"</span>: <span class="s">"EC61357476"</span>, <span class="p">"a_ThemeNm"</span>: <span class="s">"none"</span>, <span class="p">"a_leaseFlag"</span>: <span class="s">"Y"</span> }
+
+──── Response ────
+{
+  <span class="p">"data"</span>: {
+    <span class="p">"avo"</span>: {
+      <span class="p">"carCd"</span>: <span class="s">"EC61357476"</span>,
+      <span class="p">"mnuftrNm"</span>: <span class="s">"제네시스"</span>,
+      <span class="p">"modelNm"</span>: <span class="s">"GV80 (F/L)"</span>,
+      <span class="p">"grdNm"</span>: <span class="s">"가솔린 2.5 4WD"</span>,
+      <span class="p">"milg"</span>: <span class="s">"21849"</span>,
+      <span class="p">"salprc"</span>: <span class="n">64300000</span>,
+      <span class="p">"fuelTypecdNm"</span>: <span class="s">"가솔린"</span>,
+      <span class="p">"extrColorNm"</span>: <span class="s">"흰색"</span>,
+      <span class="p">"acdtHistComnt"</span>: <span class="s">"단순수리"</span>,
+      <span class="p">"cntrNm"</span>: <span class="s">"홈서비스 메가센터"</span>,
+      <span class="p">"viewCnt"</span>: <span class="s">"7415"</span>,
+      <span class="p">"likeCnt"</span>: <span class="s">"30"</span>
+      <span class="c">// + 200개 이상의 추가 필드</span>
+    }
+  }
+}</pre>
+
+<h3>6-5. 인기 모델 — GET <code>/bc/search/model-ranking?type=0</code></h3>
+
+<pre>{
+  <span class="p">"data"</span>: {
+    <span class="p">"ranking"</span>: {
+      <span class="p">"totalCnt"</span>: <span class="n">10</span>,
+      <span class="p">"rows"</span>: [
+        { <span class="p">"rank"</span>: <span class="n">1</span>,  <span class="p">"model"</span>: <span class="s">"G80"</span>,            <span class="p">"cnt"</span>: <span class="n">19405</span> },
+        { <span class="p">"rank"</span>: <span class="n">2</span>,  <span class="p">"model"</span>: <span class="s">"더 뉴 그랜저"</span>,  <span class="p">"cnt"</span>: <span class="n">16200</span> },
+        { <span class="p">"rank"</span>: <span class="n">3</span>,  <span class="p">"model"</span>: <span class="s">"G80 (RG3)"</span>,     <span class="p">"cnt"</span>: <span class="n">14772</span> },
+        { <span class="p">"rank"</span>: <span class="n">4</span>,  <span class="p">"model"</span>: <span class="s">"카니발 (4세대)"</span>,<span class="p">"cnt"</span>: <span class="n">13680</span> },
+        { <span class="p">"rank"</span>: <span class="n">5</span>,  <span class="p">"model"</span>: <span class="s">"아반떼 (CN7)"</span>,  <span class="p">"cnt"</span>: <span class="n">11961</span> },
+        ...
+      ]
+    }
+  }
+}</pre>
+
+<h3>6-6. 예상 배송일 — GET <code>/bc/expct-dlvr-date</code></h3>
+
+<pre>{ <span class="p">"data"</span>: { <span class="p">"expctDlvrDate"</span>: { <span class="p">"weekOfDay"</span>: <span class="s">"내일"</span>, <span class="p">"deliveryDate"</span>: <span class="s">"20260522"</span> } } }</pre>
+
+<h2>7. 이미지 자산</h2>
+
+<p>차량당 360° 회전 이미지가 외관(open) 36장 + 도어오픈(close) 36장 = <b>72장</b>이 인증 없이 공개되어 있습니다. 메인 썸네일 + 내부 고화질 별도.</p>
+
+<pre>https://img.kcar.com/3dcarpicture/<span class="s">{YYYY}</span>/<span class="s">{MM}</span>/<span class="s">{centerCd}</span>/<span class="s">{carCdSuffix}</span>_1/
+  ├── main/main780.jpg                       <span class="c">// 메인 썸네일</span>
+  ├── open/open_<span class="s">{000..350}</span>_lq.jpg            <span class="c">// 360° × 36장 (10도 간격)</span>
+  ├── close/close_<span class="s">{000..350}</span>_lq.jpg          <span class="c">// 도어 오픈 360° × 36장</span>
+  └── inner/inner_hq.jpg                     <span class="c">// 내부 고화질</span></pre>
+
+<p>예시: <code>https://img.kcar.com/3dcarpicture/2026/04/173/61357476_1/open/open_120_lq.jpg</code></p>
+
+<h2>8. 데이터 품질 평가 — 중고차 수출 플랫폼 적합도</h2>
+
+<table>
+<thead><tr><th>수출 플랫폼 필수 데이터</th><th>K-Car 제공 여부</th><th>비고</th></tr></thead>
+<tbody>
+<tr><td>제조사/모델/세부등급</td><td><span class="badge ok">✓ 완벽</span></td><td>코드 + 한글명 모두</td></tr>
+<tr><td>연식·제조연월·주행거리</td><td><span class="badge ok">✓ 완벽</span></td><td><code>prdcnYr</code>, <code>mfgDt</code>, <code>milg</code></td></tr>
+<tr><td>판매가</td><td><span class="badge ok">✓ 완벽</span></td><td>만원·원 단위 모두 (<code>prc</code>, <code>salprc</code>)</td></tr>
+<tr><td>VIN (차대번호)</td><td><span class="badge ok">✓ 완벽</span></td><td>수출 통관 필수, <code>/bc/detail/gov/bas</code></td></tr>
+<tr><td>차량 제원 (중량/치수/연비)</td><td><span class="badge ok">✓ 완벽</span></td><td>해외 등록 필수</td></tr>
+<tr><td>사고/수리 이력</td><td><span class="badge ok">✓ 부품별</span></td><td>판금/교환 부품을 외관 10 + 프레임 26개로 세분화</td></tr>
+<tr><td>옵션 (총 47종)</td><td><span class="badge ok">✓ 완벽</span></td><td>코드 + 한글명</td></tr>
+<tr><td>차량 이미지</td><td><span class="badge ok">✓ 360° × 72장</span></td><td>해외 바이어 신뢰도에 결정적</td></tr>
+<tr><td>색상</td><td><span class="badge ok">✓ 완벽</span></td><td>색상명 + 코드</td></tr>
+<tr><td>최고출력·연료타입</td><td><span class="badge ok">✓ 완벽</span></td><td>해외 시장 사양 비교용</td></tr>
+</tbody></table>
+
+<p><b>결론:</b> 수출 플랫폼에 필요한 모든 데이터가 K-Car 응답에 이미 포함되어 있습니다. 추가 변환·정제만 하면 바로 바이어 화면에 노출 가능한 품질입니다.</p>
+
+<h2 id="권고">9. 운영 권고</h2>
+
+<h3>9-1. 시나리오 비교</h3>
+
+<table>
+<thead><tr><th>시나리오</th><th>기술 가능성</th><th>운영 안정성</th><th>법적 안전성</th><th>추천</th></tr></thead>
+<tbody>
+<tr>
+  <td><b>(A) 공식 데이터 제휴</b><br>K-Car B2B 계약 보유</td>
+  <td><span class="badge ok">✓</span></td>
+  <td><span class="badge ok">✓</span></td>
+  <td><span class="badge ok">✓</span></td>
+  <td>★★★</td>
+</tr>
+<tr>
+  <td><b>(B) 관리자 수동 등록</b><br>엑셀 일괄 + 단건 수정</td>
+  <td><span class="badge ok">✓</span></td>
+  <td><span class="badge ok">✓</span></td>
+  <td><span class="badge ok">✓</span></td>
+  <td>★★</td>
+</tr>
+<tr>
+  <td><b>(C) 비공식 API 직접 호출</b><br>본 보고서의 방식</td>
+  <td><span class="badge ok">✓ 100%</span></td>
+  <td><span class="badge danger">키 로테이션 시 다운</span></td>
+  <td><span class="badge danger">약관·DB권 침해</span></td>
+  <td>❌</td>
+</tr>
+</tbody></table>
+
+<h3>9-2. (C) 비공식 호출의 구체적 리스크</h3>
+
+<ul>
+  <li><b>약관 위반</b> — K-Car 이용약관 + 저작권법 제93조(DB권) 침해 가능성</li>
+  <li><b>개인정보</b> — 응답에 판매자 휴대폰·차대번호(VIN) 포함, 별도 수집·이용 동의 필요</li>
+  <li><b>키 로테이션</b> — K-Car가 키를 바꾸면 서비스 즉시 다운. JS 재분석→패치→배포 사이클 반복 강제</li>
+  <li><b>IP/UA 차단</b> — 비정상 트래픽 패턴 감지 시 즉시 IP 차단</li>
+  <li><b>SLA 부재</b> — 비공식 채널이라 가격 오류·데이터 누락 시 책임 소재 불분명</li>
+  <li><b>법적 책임 이전</b> — 외주 개발자가 구현했더라도 운영 책임은 발주사로 귀속</li>
+</ul>
+
+<div class="callout danger">
+  <b>본 견적에는 (C) 시나리오를 포함하지 않습니다.</b> 본 보고서의 기술 분석은 클라이언트가 (A)/(B) 사이에서 명확한 판단을 내릴 수 있도록 "기술적 천장이 어디인가"를 보여드리기 위한 자료입니다.
+</div>
+
+<h3>9-3. 미팅에서 확인이 필요한 4가지</h3>
+
+<ol>
+  <li>K-Car와 <b>공식 데이터 제휴/B2B 계약</b>이 있습니까? (있으면 A, 없으면 B)</li>
+  <li>데이터 출처는 K-Car만? 아니면 <b>엔카·SK엔카·자체 매입 차량</b>도 함께?</li>
+  <li>차량 사진의 <b>저작권</b> 처리는? (K-Car 이미지 그대로 노출 vs 자체 촬영)</li>
+  <li>도미니카 바이어 측 <b>가격 단위·통화·세금</b> 표기 기준은?</li>
+</ol>
+
+<h2>10. 권장 견적안 (요약)</h2>
+
+<table>
+<thead><tr><th>항목</th><th>옵션 A (공식 제휴)</th><th>옵션 B (수동 관리, 기본)</th></tr></thead>
+<tbody>
+<tr><td>기획·UI/UX 디자인</td><td>포함</td><td>포함</td></tr>
+<tr><td>반응형 웹 (PC/Mobile)</td><td>포함</td><td>포함</td></tr>
+<tr><td>관리자 (차량 CRUD + 자동 견적 로직)</td><td>포함</td><td>포함</td></tr>
+<tr><td>WhatsApp 문의 연동</td><td>포함</td><td>포함</td></tr>
+<tr><td>주문/물류 단계별 상태 (관리자 수동)</td><td>포함</td><td>포함</td></tr>
+<tr><td>모바일 앱 (웹앱 래핑 권장)</td><td>포함</td><td>포함</td></tr>
+<tr><td><b>K-Car 데이터 연동</b></td><td>공식 API/CSV 피드 연동 (+7~10일)</td><td>엑셀 일괄 업로드 + 단건 등록</td></tr>
+<tr><td><b>제안가 (위시켓 0.95 기준)</b></td><td colspan="2" style="text-align:center"><span class="price">1,425만원</span> <span style="color:var(--muted); font-size:13px; margin-left:8px">(예산 1,500만 × 0.95)</span></td></tr>
+</tbody></table>
+
+<hr>
+
+<h2>11. 검증 환경 / 재현 정보</h2>
+
+<table>
+<tbody>
+<tr><th>분석 일시</th><td>2026-05-21 13:47 KST</td></tr>
+<tr><th>대상 URL</th><td><code>https://www.kcar.com/bc/search</code>, <code>https://www.kcar.com/bc/detail/carInfoDtl?i_sCarCd=EC61357476</code></td></tr>
+<tr><th>브라우저</th><td>Chrome 148 (Chrome DevTools Protocol 캡처)</td></tr>
+<tr><th>분석한 JS 청크</th><td>Nuxt 빌드 9개 (총 약 6.5MB) 중 <code>e55fb8a.js</code>(2.1MB)에서 암호화 로직 발견</td></tr>
+<tr><th>실응답 저장</th><td>8개 endpoint 응답 JSON 보존 (보고자 로컬)</td></tr>
+<tr><th>검증한 차량</th><td>1건 (carCd <code>EC61357476</code>, 제네시스 GV80, 차량번호 214머4062)</td></tr>
+</tbody></table>
+
+<footer>
+  <p><b>제안자</b> 권혁 GwonHyeok · 10년차 풀스택 개발자</p>
+  <p>SoulTalk(국내 1위 타로앱)·모든별키즈(아동발달 매칭 플랫폼)·피지컬갤러리 PRO 등 운영 플랫폼 다수 구축. <a href="https://gwonhyeok.github.io">포트폴리오 →</a></p>
+  <p style="margin-top:18px; color:var(--muted); font-size:11px;">
+    본 보고서는 위시켓 #155535 입찰 검토용 비공개 자료입니다 (noindex).
+    문서에 포함된 클라이언트 코드 발췌·암호화 사양은 K-Car 사이트의 공개된 클라이언트 번들에서 식별 가능한 정보의 기록이며,
+    무단 운영을 권장하거나 K-Car의 권리를 침해할 의도가 없음을 명시합니다.
+    분석 목적은 발주사가 (A)·(B) 시나리오 사이에서 합리적 판단을 내릴 수 있는 근거 제공입니다.
+  </p>
+</footer>
+
+</main>
+
+</body>
+</html>
