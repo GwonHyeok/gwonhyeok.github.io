@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>태양광 매칭 AI 오케스트레이터 사전 설계 — 위시켓 #155530</title>
+<meta name="description" content="자연어 리드 추출 + Tool Calling 오케스트레이션 + Streamlit 데모 — 3주 안에 production 확장 가능한 아키텍처로 단단히. 권혁 (12년차 풀스택).">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --ink: #0c0e10; --ink-2: #2b2f33; --muted: #6b7178; --line: #e6e8ec; --bg: #fafaf8; --paper: #ffffff; --accent-bg: #f1f1ed; --brand: #2563eb; --ok: #16a34a; --warn: #d97706; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: 'Inter', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 15px; line-height: 1.65; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  .page { max-width: 860px; margin: 0 auto; background: var(--paper); padding: 72px 64px 96px; border-left: 1px solid var(--line); border-right: 1px solid var(--line); min-height: 100vh; }
+  header.cover { border-bottom: 1px solid var(--line); padding-bottom: 28px; margin-bottom: 40px; }
+  .eyebrow { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  h1 { font-size: 30px; line-height: 1.25; font-weight: 700; margin: 0 0 14px; letter-spacing: -0.01em; }
+  .lede { color: var(--ink-2); font-size: 16px; margin: 0 0 18px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 24px; font-size: 13px; color: var(--muted); }
+  .meta b { color: var(--ink-2); font-weight: 500; }
+  h2 { font-size: 18px; font-weight: 700; margin: 48px 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--line); letter-spacing: -0.005em; }
+  h3 { font-size: 15px; font-weight: 600; margin: 28px 0 10px; }
+  p { margin: 10px 0; }
+  ul, ol { padding-left: 20px; margin: 10px 0; }
+  li { margin: 4px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+  th, td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+  th { font-weight: 600; background: var(--accent-bg); font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-2); }
+  .callout { border: 1px solid var(--line); background: var(--accent-bg); padding: 14px 18px; margin: 18px 0; font-size: 14px; border-radius: 2px; }
+  .callout.warn { border-left: 3px solid var(--warn); background: #fef9ec; }
+  .callout.ok { border-left: 3px solid var(--ok); background: #f0fdf4; }
+  .callout b { color: var(--ink); }
+  code { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; background: var(--accent-bg); padding: 1px 5px; border-radius: 2px; }
+  pre { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; background: #0c0e10; color: #d4d4d4; padding: 16px 18px; border-radius: 2px; overflow-x: auto; line-height: 1.55; margin: 12px 0; }
+  pre .k { color: #c586c0; }
+  pre .s { color: #ce9178; }
+  pre .n { color: #b5cea8; }
+  pre .c { color: #6a9955; font-style: italic; }
+  pre .p { color: #569cd6; }
+  pre .y { color: #dcdcaa; }
+  .price { font-size: 22px; font-weight: 700; }
+  .badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 500; background: var(--accent-bg); color: var(--ink-2); }
+  .badge.ok { background: #dcfce7; color: #166534; }
+  .badge.warn { background: #fef3c7; color: #92400e; }
+  hr { border: 0; border-top: 1px solid var(--line); margin: 32px 0; }
+  footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+  footer a { color: var(--ink-2); }
+  @media (max-width: 720px) {
+    .page { padding: 40px 22px 64px; }
+    h1 { font-size: 24px; }
+    pre { font-size: 11.5px; padding: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<main class="page">
+
+<header class="cover">
+  <div class="eyebrow">사전 설계 제안서 · 위시켓 #155530</div>
+  <h1>태양광 매칭 AI 오케스트레이터 사전 설계</h1>
+  <p class="lede">자연어 리드 추출 → Tool Calling 오케스트레이션 → Streamlit 데모 UI. 3주 안에 production 확장이 가능한 아키텍처로 단단히 설계하고, RAG·다채널 입력·추가 Tool을 무수정으로 얹을 수 있는 인터페이스를 미리 깔아둡니다.</p>
+  <div class="meta">
+    <span><b>제안자</b> 권혁 (12년차 풀스택)</span>
+    <span><b>예산</b> 500만원 (VAT 별도, 정부지원사업)</span>
+    <span><b>기간</b> 3주</span>
+    <span><b>스택</b> Python · FastAPI · LangChain · GPT-4o · Streamlit</span>
+  </div>
+</header>
+
+<h2>1. 한줄 요약</h2>
+<p>발주사가 제공하는 매칭/수익 코어 엔진 API를 신뢰하고, 그 위에서 <b>자연어 → 구조화 → 보완 질문 → 다중 Tool 오케스트레이션 → 합성 응답</b>의 6단계 파이프라인을 짭니다. 단순 데모가 아니라 다음 단계에서 RAG·여러 LLM 공급자·다채널(웹/카카오톡/이메일)로 확장할 때 코어를 다시 짤 필요가 없는 형태로 설계합니다.</p>
+
+<div class="callout ok">
+<b>"시니어 레벨로 3주 이내에 핵심 아키텍처를 단단하게"</b>라는 우대 사항에 정확히 부합하는 구성으로 제안합니다.
+</div>
+
+<h2>2. 아키텍처</h2>
+
+<pre><span class="c">// 시스템 구조</span>
+[Streamlit Demo UI]                   <span class="c">// 모듈 4</span>
+   │  사용자 자연어
+   ▼
+[FastAPI Gateway]
+   │  POST /api/conversation
+   ▼
+┌────────────────────────────────┐
+│  Lead Extractor (모듈 1)        │   LLM call #1
+│  자연어 → Pydantic schema       │   필수필드 누락 → Clarification 생성
+└──────────┬─────────────────────┘
+           │ structured lead
+           ▼
+┌────────────────────────────────┐
+│  Orchestrator (모듈 3)          │   LLM call #2 (Tool Calling)
+│  GPT-4o function calling        │
+│  ├─ tool: solar_match_api       │   ← 발주사 제공
+│  ├─ tool: revenue_estimate_api  │   ← 발주사 제공
+│  ├─ tool: public_irradiance     │   ← 공공 API (기상청/한전)
+│  └─ tool: kb_search (Dummy)     │   ← RAG 사전 세팅
+└──────────┬─────────────────────┘
+           │ tool results
+           ▼
+[Synthesizer]                         <span class="c">// LLM call #3 (선택)</span>
+   │  자연어 응답 + 리포트 카드
+   ▼
+[Streamlit] ← 챗봇 + 추천 카드 + 지표
+
+[Langfuse]  ← 전 구간 트레이싱 (입력/도구호출/출력/지연/비용)</pre>
+
+<h2>3. 모듈 상세 설계</h2>
+
+<h3>3-1. 모듈 1 — 리드 추출 (Lead Extractor)</h3>
+
+<p>사용자의 한 문장에서 핵심 정보 6개를 Pydantic schema로 추출. 필수 누락 시 자연스러운 보완 질문을 생성합니다.</p>
+
+<pre><span class="k">from</span> pydantic <span class="k">import</span> BaseModel, Field
+<span class="k">from</span> typing <span class="k">import</span> Optional, Literal
+
+<span class="k">class</span> <span class="y">SolarLead</span>(BaseModel):
+    region:       Optional[<span class="k">str</span>]   = Field(<span class="k">None</span>, description=<span class="s">"시/군/구 또는 위경도"</span>)
+    capacity_kw:  Optional[<span class="k">float</span>] = Field(<span class="k">None</span>, description=<span class="s">"발전 용량 kW"</span>)
+    install_type: Optional[Literal[<span class="s">"roof"</span>, <span class="s">"ground"</span>, <span class="s">"carport"</span>]] = <span class="k">None</span>
+    budget_won:   Optional[<span class="k">int</span>]   = <span class="k">None</span>
+    timeline:     Optional[<span class="k">str</span>]   = Field(<span class="k">None</span>, description=<span class="s">"착공 희망 시점"</span>)
+    purpose:      Optional[Literal[<span class="s">"self_use"</span>, <span class="s">"sell_to_grid"</span>, <span class="s">"hybrid"</span>]] = <span class="k">None</span>
+
+<span class="k">class</span> <span class="y">ExtractionResult</span>(BaseModel):
+    lead: SolarLead
+    missing_required: <span class="k">list</span>[<span class="k">str</span>]       <span class="c"># 누락 필수 필드</span>
+    clarification: Optional[<span class="k">str</span>]      <span class="c"># 다음 보완 질문</span>
+    confidence: <span class="k">float</span></pre>
+
+<p><b>예시 입력 → 출력</b></p>
+
+<table>
+<thead><tr><th>사용자 발화</th><th>추출 결과</th></tr></thead>
+<tbody>
+<tr>
+  <td>"용인쪽 공장 옥상에 200kW 정도 올리고 싶은데 자금은 3억쯤이에요"</td>
+  <td><code>region=용인</code>, <code>capacity_kw=200</code>, <code>install_type=roof</code>, <code>budget_won=3억</code> · <code>missing: [timeline, purpose]</code> · clarification: "착공 희망 시점과, 발전 전력 사용 목적(자가소비/판매)을 알려주실 수 있을까요?"</td>
+</tr>
+<tr>
+  <td>"태양광 좀 알아보고 있어요"</td>
+  <td>전부 null · clarification: "어느 지역에 어떤 규모로 검토 중이신가요? 옥상/노지 등 설치 위치와 대략적인 용량(kW)을 알려주시면 도움 드리기 수월합니다."</td>
+</tr>
+</tbody></table>
+
+<h3>3-2. 모듈 3 — 오케스트레이터 (Tool Calling)</h3>
+
+<p>구조화된 리드를 받아 GPT-4o의 Function Calling으로 다음 4개 tool을 상황에 맞게 호출합니다.</p>
+
+<pre>tools = [
+  {
+    <span class="p">"name"</span>: <span class="s">"solar_match_api"</span>,
+    <span class="p">"description"</span>: <span class="s">"발주사 매칭 엔진. 리드 정보로 적합 시공사 점수화 결과 반환"</span>,
+    <span class="p">"parameters"</span>: { <span class="s">"region"</span>: <span class="s">"str"</span>, <span class="s">"capacity_kw"</span>: <span class="s">"float"</span>, <span class="s">"install_type"</span>: <span class="s">"str"</span> }
+  },
+  {
+    <span class="p">"name"</span>: <span class="s">"revenue_estimate_api"</span>,
+    <span class="p">"description"</span>: <span class="s">"발주사 수익 계산기. 위치·용량·일사량으로 예상 연수익 산출"</span>,
+    <span class="p">"parameters"</span>: { <span class="s">"region"</span>: <span class="s">"str"</span>, <span class="s">"capacity_kw"</span>: <span class="s">"float"</span>, <span class="s">"irradiance_kwh_m2"</span>: <span class="s">"float"</span> }
+  },
+  {
+    <span class="p">"name"</span>: <span class="s">"public_irradiance"</span>,
+    <span class="p">"description"</span>: <span class="s">"기상청/한전 공공 일사량 데이터 조회. 지역 입력 시 연간 평균 일사량 반환"</span>,
+    <span class="p">"parameters"</span>: { <span class="s">"region"</span>: <span class="s">"str"</span> }
+  },
+  {
+    <span class="p">"name"</span>: <span class="s">"kb_search"</span>,                              <span class="c">// Dummy / 확장 인터페이스</span>
+    <span class="p">"description"</span>: <span class="s">"지식베이스 검색. 향후 RAG 연동 시 활성화"</span>,
+    <span class="p">"parameters"</span>: { <span class="s">"query"</span>: <span class="s">"str"</span> }
+  }
+]</pre>
+
+<p><b>전형적 호출 시퀀스</b></p>
+
+<pre>1. orchestrator(lead)
+2.   → tool_call: public_irradiance(region=<span class="s">"용인"</span>)
+3.   ← { irradiance: <span class="n">1340</span> }
+4.   → tool_call: revenue_estimate_api(region=<span class="s">"용인"</span>, capacity_kw=<span class="n">200</span>, irradiance_kwh_m2=<span class="n">1340</span>)
+5.   ← { annual_revenue_krw: <span class="n">38_000_000</span>, payback_years: <span class="n">7.8</span> }
+6.   → tool_call: solar_match_api(region=<span class="s">"용인"</span>, capacity_kw=<span class="n">200</span>, install_type=<span class="s">"roof"</span>)
+7.   ← { matches: [...3 contractors with scores...] }
+8. synthesize(...) → "용인 지역 옥상형 200kW, 예상 연수익 3,800만원..."</pre>
+
+<h3>3-3. 모듈 4 — Streamlit 데모 UI</h3>
+
+<pre>┌─────────────────────────────────────────────────────────┐
+│  ☀ Solar Lead Concierge — Demo                           │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│  [User]  용인쪽 공장 옥상에 200kW 정도, 자금 3억          │
+│                                                         │
+│  [Bot]   착공 희망 시점과 전력 사용 목적을 알려주시면      │
+│          더 정확한 견적을 드릴 수 있어요.                  │
+│                                                         │
+│  [User]  올해 11월 착공, 자가소비 위주로                  │
+│                                                         │
+│  [Bot]   ✅ 분석 중...                                    │
+│          • 공공 일사량 조회: 용인 → 연 1,340 kWh/m²       │
+│          • 예상 연수익 계산: 약 3,800만원 (회수 7.8년)    │
+│          • 시공사 매칭: 적합 업체 3곳                      │
+│                                                         │
+│  ┌─────────── 추천 카드 ────────────┐                    │
+│  │ ① 그린솔라  점수 92  포트폴리오↗  │                    │
+│  │ ② 한솔EPC  점수 88  포트폴리오↗  │                    │
+│  │ ③ KCS태양광 점수 85  포트폴리오↗  │                    │
+│  └────────────────────────────────┘                    │
+└─────────────────────────────────────────────────────────┘</pre>
+
+<h2>4. 비기능 요구사항 대응</h2>
+
+<table>
+<thead><tr><th>요구사항</th><th>설계</th></tr></thead>
+<tbody>
+<tr>
+  <td>공공 API 지연 시 Fallback</td>
+  <td>tool 호출은 <code>asyncio.wait_for(timeout=3s)</code>. 타임아웃 시 LLM에게 "공공 일사량을 받지 못함, 추정치 사용"을 알리고 보수적 기본값 1100 kWh/m² 으로 계속 진행</td>
+</tr>
+<tr>
+  <td>Langfuse 모니터링</td>
+  <td>OpenAI 호출·tool 호출·총 토큰·지연·비용을 trace ID 단위로 묶어 자동 기록. 매 세션 URL을 Streamlit 디버그 패널에 노출</td>
+</tr>
+<tr>
+  <td>매칭 엔진과 무관</td>
+  <td>매칭/수익 계산은 발주사 API에 위임. 본 시스템은 호출자(orchestrator)만 책임</td>
+</tr>
+<tr>
+  <td>RAG 사전 세팅</td>
+  <td>tool <code>kb_search</code> Dummy 등록 + 인터페이스 정의만 완료. 향후 RAG 인덱스 추가 시 핸들러만 교체</td>
+</tr>
+<tr>
+  <td>다채널 확장</td>
+  <td>FastAPI Gateway가 단일 진입점 → Streamlit/카카오톡/이메일 봇이 모두 동일 endpoint 사용</td>
+</tr>
+</tbody></table>
+
+<h2>5. 3주 일정</h2>
+
+<table>
+<thead><tr><th>주차</th><th>산출물</th></tr></thead>
+<tbody>
+<tr>
+  <td>1주차</td>
+  <td>발주사 매칭/수익 API 명세 협의 · 리드 추출 모듈 + 보완질문 루프 · Pydantic schema 확정 · Langfuse 연결</td>
+</tr>
+<tr>
+  <td>2주차</td>
+  <td>Orchestrator(Tool Calling) · 공공 일사량 API 어댑터 · Fallback 정책 · 합성 응답 프롬프트</td>
+</tr>
+<tr>
+  <td>3주차</td>
+  <td>Streamlit UI · 통합 테스트 · 대화 시나리오 5종 회귀 · 운영 매뉴얼 · API 명세서 작성 · 이관</td>
+</tr>
+</tbody></table>
+
+<h2>6. 산출물</h2>
+<ul>
+  <li>시스템 아키텍처 다이어그램 + API 명세서</li>
+  <li>FastAPI 백엔드 소스코드 (Lead Extractor / Orchestrator / Synthesizer)</li>
+  <li>Streamlit 데모 UI 소스코드</li>
+  <li>프롬프트 스크립트 별도 디렉토리 (<code>/prompts/*.md</code>) — 발주사가 코드 수정 없이 프롬프트만 튜닝 가능</li>
+  <li>대화 시나리오 회귀 테스트 5종</li>
+  <li>운영 매뉴얼 (Langfuse 모니터링 + 일반적인 장애 케이스 대응)</li>
+</ul>
+
+<h2>7. 견적</h2>
+
+<table>
+<tbody>
+<tr><td>견적</td><td><span class="price">500만원</span> (VAT 별도)</td></tr>
+<tr><td>기간</td><td>3주 (착수 ~ 2026-06 중순)</td></tr>
+<tr><td>인력</td><td>시니어 풀스택 1인 전담</td></tr>
+</tbody></table>
+
+<h2>8. 미팅 시 함께 확인할 사항</h2>
+<ol>
+  <li>발주사 매칭/수익 API 명세 (입출력 JSON · 인증 방식 · 응답 시간)</li>
+  <li>공공 API 후보 — 기상청 vs 한전 vs 국립환경과학원 어느 것을 우선 사용할지</li>
+  <li>OpenAI API Key 환경 (조직/프로젝트 분리 여부)</li>
+  <li>정부지원사업 행정 서류 (소프트웨어사업자 신고 등) 요구 사항</li>
+</ol>
+
+<hr>
+
+<footer>
+  <p><b>제안자</b> 권혁 GwonHyeok · 12년차 풀스택 개발자</p>
+  <p>SoulTalk(국내 1위 타로앱)·ClawOps(AI 전화 SaaS, LangChain Tool Calling 운영)·AI PD(FastAPI 자동화 파이프라인) 등 LLM Tool Calling 상용 운영 다수.</p>
+  <p style="margin-top:18px; color:var(--muted); font-size:11px;">
+    본 보고서는 위시켓 #155530 입찰 검토용 비공개 자료입니다 (noindex).
+  </p>
+</footer>
+
+</main>
+
+</body>
+</html>
