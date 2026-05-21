@@ -31,18 +31,16 @@
   th { font-weight: 600; background: var(--accent-bg); font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-2); }
   .callout { border: 1px solid var(--line); background: var(--accent-bg); padding: 14px 18px; margin: 18px 0; font-size: 14px; border-radius: 2px; }
   .callout.warn { border-left: 3px solid var(--warn); background: #fef9ec; }
-  .callout.danger { border-left: 3px solid var(--danger); background: #fef2f2; }
   .callout.ok { border-left: 3px solid var(--ok); background: #f0fdf4; }
   .callout b { color: var(--ink); }
 
   code { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; background: var(--accent-bg); padding: 1px 5px; border-radius: 2px; }
   pre { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; background: #0c0e10; color: #d4d4d4; padding: 16px 18px; border-radius: 2px; overflow-x: auto; line-height: 1.55; margin: 12px 0; }
-  pre .k { color: #c586c0; }     /* keyword */
-  pre .s { color: #ce9178; }     /* string */
-  pre .n { color: #b5cea8; }     /* number */
+  pre .k { color: #c586c0; }
+  pre .s { color: #ce9178; }
+  pre .n { color: #b5cea8; }
   pre .c { color: #6a9955; font-style: italic; }
-  pre .p { color: #569cd6; }     /* prop key */
-  pre .h { color: #4ec9b0; }     /* host/path */
+  pre .p { color: #569cd6; }
 
   .endpoint { border: 1px solid var(--line); border-radius: 2px; margin: 14px 0; overflow: hidden; }
   .endpoint-head { padding: 10px 14px; background: var(--accent-bg); display: flex; align-items: center; gap: 10px; font-size: 13px; }
@@ -59,7 +57,6 @@
   .badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 500; background: var(--accent-bg); color: var(--ink-2); }
   .badge.ok { background: #dcfce7; color: #166534; }
   .badge.warn { background: #fef3c7; color: #92400e; }
-  .badge.danger { background: #fee2e2; color: #991b1b; }
   hr { border: 0; border-top: 1px solid var(--line); margin: 32px 0; }
   footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); }
   footer a { color: var(--ink-2); }
@@ -79,7 +76,7 @@
 <header class="cover">
   <div class="eyebrow">기술 검증 보고서 · 위시켓 #155535</div>
   <h1>K-Car 차량 데이터 연동 기술 분석</h1>
-  <p class="lede">해외 바이어 대상 중고차 수출 플랫폼 MVP 구축 — K-Car 외부 데이터 연동의 기술적 가능성, 응답 데이터 품질, 운영·법적 리스크를 실측으로 검증한 보고서입니다.</p>
+  <p class="lede">해외 바이어 대상 중고차 수출 플랫폼 MVP 구축 — K-Car 외부 데이터 연동을 실측으로 검증한 보고서입니다. 8개 endpoint, 실제 Request/Response, 검색 API 암호화 사양까지 가감 없이 기록했습니다.</p>
   <div class="meta">
     <span><b>제안자</b> 권혁 (10년차 풀스택)</span>
     <span><b>분석일</b> 2026-05-21</span>
@@ -88,15 +85,11 @@
   </div>
 </header>
 
-<div class="callout warn">
-  <b>이 문서의 위치:</b> 입찰 단계에서 클라이언트가 K-Car 데이터 연동의 실제 가능성을 판단할 수 있도록 작성된 <b>기술 실측 보고서</b>입니다. 본 보고서는 <b>운영 단계에서 비공식 채널 직접 호출을 권장하지 않으며</b>, 최종 권고안은 <a href="#권고">§9. 운영 권고</a>에서 확인하실 수 있습니다.
-</div>
-
 <h2>1. 한줄 요약</h2>
 
-<p><b>기술적으로는 100% 가능합니다.</b> K-Car 사이트는 자사 프론트엔드(www.kcar.com)에서 단일 백엔드(api.kcar.com)로 호출하는 8개의 핵심 API로 구성돼 있고, 차량 검색만 가벼운 난독화(AES-128, 키·IV 클라이언트 하드코딩)가 적용되어 있으며, 응답은 모두 평문 JSON입니다. 차량당 VIN·사고이력·부품별 진단·360° 이미지 72장까지 전부 받을 수 있습니다.</p>
+<p>K-Car 사이트는 자사 프론트엔드(<code>www.kcar.com</code>)에서 단일 백엔드(<code>api.kcar.com</code>)로 호출하는 <b>8개 핵심 API</b>로 구성돼 있습니다. 검색 리스트 API <b>3개만</b> 페이로드를 AES-128-CBC로 암호화하지만 <b>키·IV가 클라이언트 JS에 평문으로 박혀 있어 사실상 난독화 수준</b>이고, 나머지 상세·메타 API는 모두 평문 GET/POST입니다. 응답은 전부 평문 JSON, 차량당 VIN·사고이력·부품별 진단·360° 이미지 72장까지 받을 수 있습니다.</p>
 
-<p><b>다만 운영 단계에서는 권장하지 않습니다.</b> 약관·DB권·개인정보·키 로테이션 리스크가 비즈니스 지속성을 위협합니다. 견적은 <b>(A) 공식 제휴 연동</b> 또는 <b>(B) 관리자 수동 등록</b> 두 트랙으로 분리해 제안합니다.</p>
+<p><b>연동 자체는 100% 가능</b>하며 이번 보고서가 그 증거입니다. 단, 운영 단계에서는 약관·데이터 신선도·키 로테이션 리스크가 존재합니다 (<a href="#risk">§8. 리스크 고지</a>).</p>
 
 <h2>2. 검증 방법</h2>
 
@@ -223,7 +216,7 @@ www.kcar.com (Nuxt SPA)
 
 <h2>5. 검색 API 암호화 사양</h2>
 
-<p>검색 리스트 API <b>3개만</b> 페이로드를 <code>enc</code> 필드 하나로 암호화 전송합니다. 나머지는 모두 평문. 키와 IV가 클라이언트 JS에 평문으로 하드코딩되어 있어 사실상 <b>난독화 수준</b>입니다 (목적은 자동 봇 1차 방어로 추정).</p>
+<p>검색 리스트 API 3개만 페이로드를 <code>enc</code> 필드 하나로 암호화 전송합니다. 키와 IV가 클라이언트 JS에 평문으로 하드코딩되어 있어 사실상 난독화 수준입니다.</p>
 
 <h3>5-1. 클라이언트 코드 (난독화 해제)</h3>
 
@@ -266,7 +259,7 @@ searchDrctList: <span class="k">function</span>(param) {
 <tr><td>응답 복호화 필요</td><td>❌ 없음 (평문 JSON)</td></tr>
 </tbody></table>
 
-<h3>5-3. Node.js 재현 (참고용)</h3>
+<h3>5-3. Node.js 재현</h3>
 
 <pre><span class="k">const</span> crypto = <span class="k">require</span>(<span class="s">'crypto'</span>);
 <span class="k">const</span> KEY = Buffer.from(<span class="s">'SKFJ2424DasfaJRI'</span>, <span class="s">'utf8'</span>);
@@ -289,10 +282,6 @@ searchDrctList: <span class="k">function</span>(param) {
   },
   body: JSON.stringify({ enc })
 });</pre>
-
-<div class="callout warn">
-  <b>왜 "암호화가 아니라 난독화"인가:</b> 키·IV가 클라이언트 JS에 평문으로 박혀 있고, IV가 고정이라 CBC의 의미도 상실됩니다. 진짜 보안이 아니라 봇 트래픽 1차 방어용 obfuscation입니다. K-Car 측이 키 로테이션을 자주 하지 않는 이유도 같은 맥락 — 키가 보호 대상이 아닌 셈입니다.
-</div>
 
 <h2>6. 실제 Request / Response 샘플</h2>
 
@@ -465,97 +454,43 @@ Content-Type: application/json
 
 <p>예시: <code>https://img.kcar.com/3dcarpicture/2026/04/173/61357476_1/open/open_120_lq.jpg</code></p>
 
-<h2>8. 데이터 품질 평가 — 중고차 수출 플랫폼 적합도</h2>
+<h2 id="risk">8. 리스크 고지</h2>
 
-<table>
-<thead><tr><th>수출 플랫폼 필수 데이터</th><th>K-Car 제공 여부</th><th>비고</th></tr></thead>
-<tbody>
-<tr><td>제조사/모델/세부등급</td><td><span class="badge ok">✓ 완벽</span></td><td>코드 + 한글명 모두</td></tr>
-<tr><td>연식·제조연월·주행거리</td><td><span class="badge ok">✓ 완벽</span></td><td><code>prdcnYr</code>, <code>mfgDt</code>, <code>milg</code></td></tr>
-<tr><td>판매가</td><td><span class="badge ok">✓ 완벽</span></td><td>만원·원 단위 모두 (<code>prc</code>, <code>salprc</code>)</td></tr>
-<tr><td>VIN (차대번호)</td><td><span class="badge ok">✓ 완벽</span></td><td>수출 통관 필수, <code>/bc/detail/gov/bas</code></td></tr>
-<tr><td>차량 제원 (중량/치수/연비)</td><td><span class="badge ok">✓ 완벽</span></td><td>해외 등록 필수</td></tr>
-<tr><td>사고/수리 이력</td><td><span class="badge ok">✓ 부품별</span></td><td>판금/교환 부품을 외관 10 + 프레임 26개로 세분화</td></tr>
-<tr><td>옵션 (총 47종)</td><td><span class="badge ok">✓ 완벽</span></td><td>코드 + 한글명</td></tr>
-<tr><td>차량 이미지</td><td><span class="badge ok">✓ 360° × 72장</span></td><td>해외 바이어 신뢰도에 결정적</td></tr>
-<tr><td>색상</td><td><span class="badge ok">✓ 완벽</span></td><td>색상명 + 코드</td></tr>
-<tr><td>최고출력·연료타입</td><td><span class="badge ok">✓ 완벽</span></td><td>해외 시장 사양 비교용</td></tr>
-</tbody></table>
-
-<p><b>결론:</b> 수출 플랫폼에 필요한 모든 데이터가 K-Car 응답에 이미 포함되어 있습니다. 추가 변환·정제만 하면 바로 바이어 화면에 노출 가능한 품질입니다.</p>
-
-<h2 id="권고">9. 운영 권고</h2>
-
-<h3>9-1. 시나리오 비교</h3>
-
-<table>
-<thead><tr><th>시나리오</th><th>기술 가능성</th><th>운영 안정성</th><th>법적 안전성</th><th>추천</th></tr></thead>
-<tbody>
-<tr>
-  <td><b>(A) 공식 데이터 제휴</b><br>K-Car B2B 계약 보유</td>
-  <td><span class="badge ok">✓</span></td>
-  <td><span class="badge ok">✓</span></td>
-  <td><span class="badge ok">✓</span></td>
-  <td>★★★</td>
-</tr>
-<tr>
-  <td><b>(B) 관리자 수동 등록</b><br>엑셀 일괄 + 단건 수정</td>
-  <td><span class="badge ok">✓</span></td>
-  <td><span class="badge ok">✓</span></td>
-  <td><span class="badge ok">✓</span></td>
-  <td>★★</td>
-</tr>
-<tr>
-  <td><b>(C) 비공식 API 직접 호출</b><br>본 보고서의 방식</td>
-  <td><span class="badge ok">✓ 100%</span></td>
-  <td><span class="badge danger">키 로테이션 시 다운</span></td>
-  <td><span class="badge danger">약관·DB권 침해</span></td>
-  <td>❌</td>
-</tr>
-</tbody></table>
-
-<h3>9-2. (C) 비공식 호출의 구체적 리스크</h3>
-
-<ul>
-  <li><b>약관 위반</b> — K-Car 이용약관 + 저작권법 제93조(DB권) 침해 가능성</li>
-  <li><b>개인정보</b> — 응답에 판매자 휴대폰·차대번호(VIN) 포함, 별도 수집·이용 동의 필요</li>
-  <li><b>키 로테이션</b> — K-Car가 키를 바꾸면 서비스 즉시 다운. JS 재분석→패치→배포 사이클 반복 강제</li>
-  <li><b>IP/UA 차단</b> — 비정상 트래픽 패턴 감지 시 즉시 IP 차단</li>
-  <li><b>SLA 부재</b> — 비공식 채널이라 가격 오류·데이터 누락 시 책임 소재 불분명</li>
-  <li><b>법적 책임 이전</b> — 외주 개발자가 구현했더라도 운영 책임은 발주사로 귀속</li>
-</ul>
-
-<div class="callout danger">
-  <b>본 견적에는 (C) 시나리오를 포함하지 않습니다.</b> 본 보고서의 기술 분석은 클라이언트가 (A)/(B) 사이에서 명확한 판단을 내릴 수 있도록 "기술적 천장이 어디인가"를 보여드리기 위한 자료입니다.
+<div class="callout warn">
+  <b>비공식 채널 직접 호출에 따른 잠재 리스크</b>
+  <ul style="margin: 8px 0 0;">
+    <li><b>약관·DB권</b> — K-Car 이용약관 및 저작권법상 데이터베이스 제작자의 권리와 충돌할 가능성</li>
+    <li><b>키 로테이션</b> — K-Car가 enc 키/IV 또는 응답 스키마를 바꾸면 서비스 즉시 다운, JS 재분석 → 패치 → 배포 사이클 반복</li>
+    <li><b>트래픽 차단</b> — 비정상 트래픽 패턴 감지 시 IP·User-Agent 차단</li>
+    <li><b>개인정보</b> — 응답에 판매자 휴대폰·차대번호(VIN)·차량번호 포함, 수집·이용에 별도 동의 처리 필요</li>
+    <li><b>SLA 부재</b> — 비공식 채널이라 데이터 신선도·정확도에 대한 보장 없음, 가격 오류 발생 시 운영 책임은 발주사</li>
+  </ul>
 </div>
 
-<h3>9-3. 미팅에서 확인이 필요한 4가지</h3>
+<p>위 리스크는 발주사가 인지하고 수용한다는 전제 하에 본 견적이 성립합니다.</p>
 
-<ol>
-  <li>K-Car와 <b>공식 데이터 제휴/B2B 계약</b>이 있습니까? (있으면 A, 없으면 B)</li>
-  <li>데이터 출처는 K-Car만? 아니면 <b>엔카·SK엔카·자체 매입 차량</b>도 함께?</li>
-  <li>차량 사진의 <b>저작권</b> 처리는? (K-Car 이미지 그대로 노출 vs 자체 촬영)</li>
-  <li>도미니카 바이어 측 <b>가격 단위·통화·세금</b> 표기 기준은?</li>
-</ol>
-
-<h2>10. 권장 견적안 (요약)</h2>
+<h2>9. 견적</h2>
 
 <table>
-<thead><tr><th>항목</th><th>옵션 A (공식 제휴)</th><th>옵션 B (수동 관리, 기본)</th></tr></thead>
+<thead><tr><th>항목</th><th>내용</th></tr></thead>
 <tbody>
-<tr><td>기획·UI/UX 디자인</td><td>포함</td><td>포함</td></tr>
-<tr><td>반응형 웹 (PC/Mobile)</td><td>포함</td><td>포함</td></tr>
-<tr><td>관리자 (차량 CRUD + 자동 견적 로직)</td><td>포함</td><td>포함</td></tr>
-<tr><td>WhatsApp 문의 연동</td><td>포함</td><td>포함</td></tr>
-<tr><td>주문/물류 단계별 상태 (관리자 수동)</td><td>포함</td><td>포함</td></tr>
-<tr><td>모바일 앱 (웹앱 래핑 권장)</td><td>포함</td><td>포함</td></tr>
-<tr><td><b>K-Car 데이터 연동</b></td><td>공식 API/CSV 피드 연동 (+7~10일)</td><td>엑셀 일괄 업로드 + 단건 등록</td></tr>
-<tr><td><b>제안가 (위시켓 0.95 기준)</b></td><td colspan="2" style="text-align:center"><span class="price">1,425만원</span> <span style="color:var(--muted); font-size:13px; margin-left:8px">(예산 1,500만 × 0.95)</span></td></tr>
+<tr><td>기획 · UI/UX 디자인</td><td>화면 설계, 디자인, 카피</td></tr>
+<tr><td>반응형 웹 (PC/Mobile)</td><td>차량 검색·상세·문의·결제 안내</td></tr>
+<tr><td>관리자</td><td>차량 CRUD, 자동 견적 로직(수출비·물류비·마진), 주문/물류 상태 수동 관리</td></tr>
+<tr><td>WhatsApp 연동</td><td>구매 의사 전달 · 단계별 안내</td></tr>
+<tr><td>모바일 앱</td><td>웹앱 래핑 (Capacitor/PWA)</td></tr>
+<tr><td><b>K-Car 데이터 연동</b></td><td>본 보고서 방식 — 검색 8개 endpoint 직접 호출, 응답 정규화, 일일 동기화 배치</td></tr>
+<tr><td>기간</td><td>약 90일 (착수일 ~ 2026년 8월말~9월)</td></tr>
+<tr><td colspan="2" style="text-align:center; padding-top:18px;">
+  <span style="color:var(--muted); font-size:13px;">위시켓 0.95 기준</span><br>
+  <span class="price">1,425만원</span>
+  <span style="color:var(--muted); font-size:13px; margin-left:8px">(예산 1,500만 × 0.95)</span>
+</td></tr>
 </tbody></table>
 
 <hr>
 
-<h2>11. 검증 환경 / 재현 정보</h2>
+<h2>10. 검증 환경 / 재현 정보</h2>
 
 <table>
 <tbody>
@@ -572,9 +507,6 @@ Content-Type: application/json
   <p>SoulTalk(국내 1위 타로앱)·모든별키즈(아동발달 매칭 플랫폼)·피지컬갤러리 PRO 등 운영 플랫폼 다수 구축. <a href="https://gwonhyeok.github.io">포트폴리오 →</a></p>
   <p style="margin-top:18px; color:var(--muted); font-size:11px;">
     본 보고서는 위시켓 #155535 입찰 검토용 비공개 자료입니다 (noindex).
-    문서에 포함된 클라이언트 코드 발췌·암호화 사양은 K-Car 사이트의 공개된 클라이언트 번들에서 식별 가능한 정보의 기록이며,
-    무단 운영을 권장하거나 K-Car의 권리를 침해할 의도가 없음을 명시합니다.
-    분석 목적은 발주사가 (A)·(B) 시나리오 사이에서 합리적 판단을 내릴 수 있는 근거 제공입니다.
   </p>
 </footer>
 
