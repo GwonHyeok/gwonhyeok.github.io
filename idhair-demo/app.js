@@ -210,6 +210,18 @@ function bindEvents() {
     render();
   });
   $$('[data-consent]').forEach(c=>c.onchange=()=>state.survey[c.dataset.consent==='required'?'requiredConsent':'marketingConsent']=c.checked);
+  $$('.filter').forEach(select=>select.onchange=()=>toast('선택한 조건으로 화면을 업데이트했습니다.'));
+  $$('.search').forEach(input=>input.oninput=()=>{
+    const query=input.value.trim().toLowerCase();
+    $$('.data-table tbody tr, .branch-card').forEach(item=>{
+      item.style.display=!query || item.textContent.toLowerCase().includes(query) ? '' : 'none';
+    });
+  });
+  $$('.btn').forEach(button=>{
+    const hasDedicatedAction=button.dataset.page || button.dataset.newSurvey !== undefined || button.dataset.surveyNext !== undefined || button.dataset.surveyPrev !== undefined || button.dataset.surveyRestart !== undefined || button.dataset.backCustomers !== undefined || button.dataset.toast;
+    if(!hasDedicatedAction && !button.disabled) button.onclick=()=>toast('미팅용 데모 기능입니다. 실제 구축 시 데이터와 연동됩니다.');
+  });
+  $$('.icon-button:not([data-menu])').forEach(button=>button.onclick=()=>toast('빠른 메뉴를 확인했습니다.'));
 }
 
 function initCharts() {
